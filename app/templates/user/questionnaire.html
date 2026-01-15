@@ -3,7 +3,7 @@
 {% block title %}Get Recommendations - TechAdvisor{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8">
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-teal-50 py-8">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Progress Bar -->
         <div class="mb-6">
@@ -13,7 +13,7 @@
             </div>
             <div class="w-full bg-gray-200 rounded-full h-1.5">
                 <div id="progressBar"
-                    class="bg-gradient-to-r from-indigo-600 to-purple-600 h-1.5 rounded-full transition-all duration-500"
+                    class="bg-gradient-to-r from-indigo-600 to-teal-600 h-1.5 rounded-full transition-all duration-500"
                     style="width: 0%"></div>
             </div>
         </div>
@@ -41,18 +41,21 @@
                     <div class="grid grid-cols-2 gap-4">
                         {% for value, label in form.category.choices %}
                         <label
-                            class="category-option relative flex flex-col items-center p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all">
+                            class="category-option relative flex flex-col items-center p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all duration-200 group">
                             <input type="radio" name="category" value="{{ value }}" class="sr-only peer">
 
+                            <!-- Icon Circle with Gradient on Selection -->
                             <div
-                                class="w-12 h-12 mb-3 rounded-full bg-indigo-50 flex items-center justify-center peer-checked:bg-indigo-600 transition-colors">
-                                <svg class="w-6 h-6 text-indigo-600 peer-checked:text-white" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    {% if value == '1' %}
+                                class="w-12 h-12 mb-3 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 peer-checked:text-white peer-checked:bg-gradient-to-br peer-checked:from-indigo-500 peer-checked:to-teal-600 transition-all duration-300 group-hover:scale-110">
+                                <svg class="w-6 h-6 text-current transition-colors" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    {% if value == 'smartphone' %}
+                                    <!-- Smartphone Icon -->
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
                                     </path>
-                                    {% else %}
+                                    {% elif value == 'laptop' %}
+                                    <!-- Laptop Icon -->
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                                     </path>
@@ -60,17 +63,26 @@
                                 </svg>
                             </div>
 
-                            <span class="text-sm font-semibold text-gray-700 peer-checked:text-indigo-600">{{ label
+                            <!-- Label -->
+                            <span
+                                class="text-sm font-semibold text-gray-700 peer-checked:text-indigo-600 transition-colors">{{
+                                label
                                 }}</span>
 
+                            <!-- Checkmark Badge -->
                             <div
-                                class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="currentColor"
-                                    viewBox="0 0 20 20">
+                                class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:bg-indigo-500 peer-checked:border-indigo-500 flex items-center justify-center transition-all duration-200">
+                                <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                                    fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                         clip-rule="evenodd"></path>
                                 </svg>
+                            </div>
+
+                            <!-- Selection Border Glow -->
+                            <div
+                                class="absolute inset-0 border-2 border-transparent peer-checked:border-indigo-500 rounded-xl peer-checked:shadow-lg peer-checked:shadow-indigo-100 transition-all duration-200">
                             </div>
                         </label>
                         {% endfor %}
@@ -86,10 +98,10 @@
                         <h2 class="text-lg font-bold text-gray-900">What's your budget?</h2>
                     </div>
 
-                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-5">
+                    <div class="bg-gradient-to-br from-indigo-50 to-teal-50 rounded-xl p-5">
                         <div class="text-center mb-4">
                             <div
-                                class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                                class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-teal-600">
                                 $<span id="budgetValue">1000</span>
                             </div>
                         </div>
@@ -111,12 +123,12 @@
                             <button type="button"
                                 class="budget-preset px-3 py-1.5 bg-white text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-100 transition-colors"
                                 data-value="1500">
-                                $1,000-$2,000
+                                $1k-$2k
                             </button>
                             <button type="button"
                                 class="budget-preset px-3 py-1.5 bg-white text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-100 transition-colors"
                                 data-value="3000">
-                                $2,000+
+                                $2k+
                             </button>
                         </div>
                     </div>
@@ -134,13 +146,14 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {% for value, label in form.usage_type.choices %}
                         <label
-                            class="usage-option relative flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-indigo-400 transition-all group">
+                            class="usage-option relative flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all duration-200 group">
                             <input type="radio" name="usage_type" value="{{ value }}" class="sr-only peer">
 
+                            <!-- Icon Circle -->
                             <div
-                                class="w-10 h-10 mb-2 rounded-full bg-indigo-50 flex items-center justify-center peer-checked:bg-indigo-600 transition-colors">
-                                <svg class="w-5 h-5 text-indigo-600 peer-checked:text-white" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                                class="w-10 h-10 mb-2 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 peer-checked:text-white peer-checked:bg-gradient-to-br peer-checked:from-indigo-500 peer-checked:to-teal-600 transition-all duration-300 group-hover:scale-110">
+                                <svg class="w-5 h-5 text-current transition-colors" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     {% if value == 'everyday' %}
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -161,11 +174,25 @@
                                 </svg>
                             </div>
 
-                            <span class="text-xs font-medium text-gray-700 text-center peer-checked:text-indigo-600">{{
+                            <!-- Label -->
+                            <span
+                                class="text-xs font-semibold text-gray-700 text-center peer-checked:text-indigo-600 transition-colors">{{
                                 label }}</span>
 
+                            <!-- Checkmark Badge -->
                             <div
-                                class="absolute inset-0 border-2 border-indigo-600 rounded-lg opacity-0 peer-checked:opacity-100">
+                                class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:bg-indigo-500 peer-checked:border-indigo-500 flex items-center justify-center transition-all duration-200">
+                                <svg class="w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+
+                            <!-- Selection Border Glow -->
+                            <div
+                                class="absolute inset-0 border-2 border-transparent peer-checked:border-indigo-500 rounded-xl peer-checked:shadow-lg peer-checked:shadow-indigo-100 transition-all duration-200">
                             </div>
                         </label>
                         {% endfor %}
@@ -190,7 +217,7 @@
                 <!-- Submit Button -->
                 <div class="text-center pt-4">
                     <button type="submit" id="submitBtn"
-                        class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg">
+                        class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-teal-600 rounded-lg hover:from-indigo-700 hover:to-teal-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg">
                         <span id="btnText" class="flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -217,7 +244,7 @@
         <!-- Trust Badges -->
         <div class="mt-6 flex items-center justify-center gap-6 text-xs text-gray-500">
             <div class="flex items-center">
-                <svg class="w-4 h-4 text-green-500 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-4 h-4 text-indigo-500 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                         clip-rule="evenodd"></path>
@@ -225,7 +252,7 @@
                 <span>100% Free</span>
             </div>
             <div class="flex items-center">
-                <svg class="w-4 h-4 text-indigo-500 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-4 h-4 text-teal-500 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
                         clip-rule="evenodd"></path>
@@ -233,7 +260,7 @@
                 <span>AI-Powered</span>
             </div>
             <div class="flex items-center">
-                <svg class="w-4 h-4 text-purple-500 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-4 h-4 text-indigo-600 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
                         clip-rule="evenodd"></path>
@@ -247,16 +274,19 @@
 <style>
     .slider::-webkit-slider-thumb {
         -webkit-appearance: none;
+        appearance: none;
         width: 20px;
         height: 20px;
         background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         cursor: pointer;
         border-radius: 50%;
         box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+        transition: all 0.2s;
     }
 
     .slider::-webkit-slider-thumb:hover {
         transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4);
     }
 
     .slider::-moz-range-thumb {
@@ -267,6 +297,12 @@
         border-radius: 50%;
         border: none;
         box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+        transition: all 0.2s;
+    }
+
+    .slider::-moz-range-thumb:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4);
     }
 
     .question-section {
