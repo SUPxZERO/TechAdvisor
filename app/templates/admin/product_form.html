@@ -184,7 +184,7 @@
 </div>
 
 <script>
-    let specCount = {{ product.specifications| length if product else 0 }};
+    let specCount = {% if product %}{ { product.specifications | list | length } } {% else %} 0{% endif %};
 
     function addSpec() {
         const container = document.getElementById('specifications-container');
