@@ -1,6 +1,12 @@
+"""
+Recommendation Service
+High-level service for generating product recommendations using the inference engine
+"""
 from app.services.inference_engine import InferenceEngine
-from app.models.product import Product, Category, Brand
+from app.models.product import Product, Category
 from app import db
+from typing import Dict, List, Any
+from sqlalchemy import and_, or_
 
 
 class RecommendationService:
@@ -9,164 +15,141 @@ class RecommendationService:
     def __init__(self):
         self.engine = InferenceEngine()
     
-    def get_recommendations(self, user_inputs, limit=3):
-        """Get top N product recommendations based on user inputs"""
-        # Run inference engine to match rules
-        matched_rules = self.engine.infer(user_inputs)
+    def get_recommendations(self, user_input: Dict[str, Any], limit: int = 10) -> Dict[str, Any]:
+        """
+        Main entry point for getting recommendations
         
-        # Get candidate products based on user inputs
-        candidate_products = self._get_candidate_products(user_inputs)
+        Args:
+            user_input: Dictionary of user preferences (budget, usage_type, etc.)
+            limit: Maximum number of products to return
         
-        # Score and rank products
-        scored_products = self._score_products(candidate_products, user_inputs, matched_rules)
+        Returns:
+            Dictionary with recommendations and metadata
+        """
+        # Run inference engine
+        fired_recommendations = self.engine.forward_chain(user_input)
         
-        # Return top N recommendations
-        return scored_products[:limit]
+        if not fired_recommendations:
+            return {
+                'products': [],
+                'message': 'No matching products found. Try adjusting your criteria.',
+                'total_matches': 0
+            }
+        
+        # Get products based on recommendations
+        products = self._fetch_products(fired_recommendations, user_input, limit)
+        
+        # Add reasoning to products
+        products_with_reasoning = self._add_reasoning(products, fired_recommendations)
+        
+        return {
+            'products': products_with_reasoning,
+            'total_matches': len(products),
+            'fired_rules': len(fired_recommendations),
+            'message': f'Found {len(products)} products matching your preferences'
+        }
     
-    def _get_candidate_products(self, inputs):
-        """Filter products based on user inputs"""
+    def _fetch_products(self, recommendations: List[Dict], user_input: Dict, limit: int) -> List[Product]:
+        """Fetch products based on fired rules and user input"""
+        # Start with base query
         query = Product.query.filter_by(is_active=True)
         
-        # Filter by category
-        if 'category' in inputs:
-            category = Category.query.filter_by(name=inputs['category']).first()
-            if category:
-                query = query.filter_by(category_id=category.id)
-        
-        # Filter by budget
-        if 'max_budget' in inputs:
+        # Apply budget filter if provided
+        if 'budget' in user_input:
             try:
-                max_budget = float(inputs['max_budget'])
-                query = query.filter(Product.price <= max_budget)
+                budget = float(user_input['budget'])
+                query = query.filter(Product.price <= budget)
             except (ValueError, TypeError):
                 pass
         
-        # Filter by brand preference
-        if 'preferred_brand' in inputs and inputs['preferred_brand'] not in ['Any', 'any', '']:
-            brand = Brand.query.filter_by(name=inputs['preferred_brand']).first()
-            if brand:
-                query = query.filter_by(brand_id=brand.id)
+        # Apply category filter from recommendations
+        category_ids = set()
+        for rec in recommendations:
+            if rec.get('category_id'):
+                category_ids.add(rec['category_id'])
         
-        return query.all()
+        if category_ids:
+            query = query.filter(Product.category_id.in_(category_ids))
+        
+        # Apply brand filter if provided
+        if 'preferred_brand' in user_input and user_input['preferred_brand']:
+            brand_name = user_input['preferred_brand']
+            query = query.join(Product.brand).filter(
+                db.func.lower(Product.brand.has(name=brand_name))
+            )
+        
+        # Order by price and limit
+        products = query.order_by(Product.price.asc()).limit(limit).all()
+        
+        return products
     
-    def _score_products(self, products, inputs, rules):
-        """Score products based on how well they match requirements"""
-        scored = []
+    def _add_reasoning(self, products: List[Product], recommendations: List[Dict]) -> List[Dict]:
+        """Add reasoning and confidence scores to product results"""
+        results = []
         
         for product in products:
-            score = 0
-            explanations = []
+            # Find matching recommendation for this product's category
+            matching_rec = None
+            for rec in recommendations:
+                if rec.get('category_id') == product.category_id:
+                    matching_rec = rec
+                    break
             
-            # Base score from price match
-            if 'max_budget' in inputs:
-                try:
-                    budget = float(inputs['max_budget'])
-                    product_price = float(product.price)
-                    if product_price <= budget:
-                        # Better score for products using more of the budget (value)
-                        score += (product_price / budget) * 30
-                        explanations.append(f"Within your ${budget:,.0f} budget")
-                except (ValueError, TypeError):
-                    pass
+            product_dict = {
+                'id': product.id,
+                'name': product.name,
+                'brand': product.brand.name,
+                'category': product.category.name,
+                'price': float(product.price),
+                'description': product.description,
+                'image_url': product.image_url,
+                'specifications': [
+                    {'key': spec.spec_key, 'value': spec.spec_value}
+                    for spec in product.specifications
+                ],
+                'confidence': matching_rec['confidence'] if matching_rec else 50,
+                'reasoning': matching_rec['reasoning'] if matching_rec else 'Matches your budget and category',
+                'matched_rule': matching_rec['rule_name'] if matching_rec else None
+            }
             
-            # Score from matched rules
-            for rule in rules:
-                score += rule.priority
-                if rule.description:
-                    explanations.append(rule.description)
-            
-            # Score from specifications matching usage type
-            usage_score, usage_reasons = self._score_for_usage(product, inputs.get('usage_type'))
-            score += usage_score
-            explanations.extend(usage_reasons)
-            
-            # Brand preference bonus
-            if 'preferred_brand' in inputs and inputs['preferred_brand'] not in ['Any', 'any', '']:
-                if product.brand.name.lower() == inputs['preferred_brand'].lower():
-                    score += 10
-                    explanations.append(f"Your preferred brand: {product.brand.name}")
-            
-            scored.append({
-                'product': product,
-                'score': score,
-                'explanations': explanations
-            })
+            results.append(product_dict)
         
-        # Sort by score descending
-        return sorted(scored, key=lambda x: x['score'], reverse=True)
+        # Sort by confidence descending
+        results.sort(key=lambda x: x['confidence'], reverse=True)
+        
+        return results
     
-    def _score_for_usage(self, product, usage_type):
-        """Score product based on usage type"""
+    def calculate_match_percentage(self, product: Product, user_input: Dict) -> int:
+        """Calculate how well a product matches user preferences (0-100)"""
         score = 0
-        reasons = []
+        total_criteria = 0
         
-        if not usage_type:
-            return score, reasons
+        # Budget match
+        if 'budget' in user_input:
+            total_criteria += 1
+            try:
+                budget = float(user_input['budget'])
+                if product.price <= budget:
+                    score += 1
+                    # Bonus for being close to budget
+                    if product.price >= budget * 0.7:
+                        score += 0.5
+            except:
+                pass
         
-        # Get product specifications as dict
-        specs = {spec.spec_key.lower(): spec.spec_value for spec in product.specifications}
+        # Brand preference
+        if 'preferred_brand' in user_input and user_input['preferred_brand']:
+            total_criteria += 1
+            if product.brand.name.lower() == user_input['preferred_brand'].lower():
+                score += 1
         
-        usage_type = usage_type.lower()
+        # Category match
+        if 'category' in user_input:
+            total_criteria += 1
+            if product.category.name.lower() == user_input['category'].lower():
+                score += 1
         
-        if usage_type == 'gaming':
-            # Check for gaming-relevant specs
-            if 'gpu' in specs and any(term in specs['gpu'].lower() for term in ['rtx', 'radeon', 'nvidia']):
-                score += 20
-                reasons.append('Powerful GPU for gaming')
-            
-            if 'ram' in specs:
-                try:
-                    ram_value = specs['ram'].lower().replace('gb', '').strip()
-                    ram_gb = int(ram_value)
-                    if ram_gb >= 16:
-                        score += 15
-                        reasons.append(f'{ram_gb}GB RAM ideal for gaming')
-                except (ValueError, TypeError):
-                    pass
-            
-            if 'processor' in specs and any(term in specs['processor'].lower() for term in ['i7', 'i9', 'ryzen 7', 'ryzen 9']):
-                score += 15
-                reasons.append('High-performance processor')
+        if total_criteria == 0:
+            return 50
         
-        elif usage_type == 'office':
-            # Office work priorities
-            if 'battery' in specs and 'hour' in specs['battery'].lower():
-                score += 15
-                reasons.append('Long battery life for productivity')
-            
-            if 'weight' in specs:
-                try:
-                    weight_str = specs['weight'].lower().replace('kg', '').replace('lbs', '').strip()
-                    weight = float(weight_str)
-                    if weight < 2.0:
-                        score += 10
-                        reasons.append('Lightweight and portable')
-                except (ValueError, TypeError):
-                    pass
-        
-        elif usage_type == 'study':
-            # Student-friendly features
-            score += 10
-            reasons.append('Great for students')
-            
-            if 'battery' in specs:
-                score += 10
-                reasons.append('Good battery life for all-day use')
-        
-        elif usage_type == 'multimedia':
-            # Content creation
-            if 'ram' in specs:
-                try:
-                    ram_value = specs['ram'].lower().replace('gb', '').strip()
-                    ram_gb = int(ram_value)
-                    if ram_gb >= 16:
-                        score += 15
-                        reasons.append(f'{ram_gb}GB RAM for multimedia work')
-                except (ValueError, TypeError):
-                    pass
-            
-            if 'display' in specs and any(term in specs['display'].lower() for term in ['4k', 'retina', 'oled']):
-                score += 15
-                reasons.append('High-quality display for content creation')
-        
-        return score, reasons
+        return int((score / total_criteria) * 100)
