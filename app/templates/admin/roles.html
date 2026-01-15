@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Roles - TechAdvisor{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Role Management</h1>
+                <p class="text-gray-600 mt-2">Manage system roles and access control</p>
+            </div>
+            {% if current_user.has_permission('role.manage') %}
+            <a href="{{ url_for('admin.role_add') }}"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors duration-200 shadow-md">
+                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Create Role
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Roles List -->
+        <div class="grid grid-cols-1 gap-6">
+            {% for role in roles %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center">
+                            <h3 class="text-xl font-bold text-gray-900">{{ role.name }}</h3>
+                            {% if role.is_system %}
+                            <span
+                                class="ml-3 px-2 py-1 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full uppercase tracking-wide">
+                                System Role
+                            </span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-600 mt-2">{{ role.description }}</p>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Permissions:</h4>
+                            {% if role.permissions %}
+                            <div class="flex flex-wrap gap-2">
+                                {% for perm in role.permissions %}
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                    {{ perm.name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-sm text-gray-500 italic">No permissions assigned</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if current_user.has_permission('role.manage') %}
+                    <div class="flex space-x-2 ml-4">
+                        <a href="{{ url_for('admin.role_edit', role_id=role.id) }}"
+                            class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors duration-150"
+                            title="Edit Role">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                </path>
+                            </svg>
+                        </a>
+
+                        {% if not role.is_system %}
+                        <form action="{{ url_for('admin.role_delete', role_id=role.id) }}" method="POST"
+                            onsubmit="return confirm('Are you sure you want to delete this role? This action cannot be undone.');"
+                            class="inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit"
+                                class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
+                                title="Delete Role">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                    </path>
+                                </svg>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

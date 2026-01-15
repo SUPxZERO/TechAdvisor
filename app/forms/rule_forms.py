@@ -59,7 +59,7 @@ class RuleForm(FlaskForm):
                                  validators=[DataRequired()])
     
     conclusion_value = StringField('Conclusion Value',
-                                  validators=[DataRequired(), Length(max=255)],
+                                  validators=[Optional(), Length(max=255)],
                                   render_kw={'placeholder': 'e.g., laptop, gaming'})
     
     is_active = BooleanField('Active (enabled in recommendations)', default=True)

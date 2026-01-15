@@ -17,8 +17,12 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
+    # RBAC Fields
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=True) # Nullable for migration
+    
     # Relationships
     audit_logs = db.relationship('AuditLog', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    # role_obj relationship is defined in Role model (backref)
     
     def set_password(self, password):
         """Hash and set user password"""
@@ -28,9 +32,35 @@ class User(UserMixin, db.Model):
         """Verify password against hash"""
         return check_password_hash(self.password_hash, password)
     
-    def has_role(self, role):
+    @property
+    def current_role(self):
+        """Get role name (handle legacy enum vs new relation)"""
+        if self.role_obj:
+            return self.role_obj.name
+        # Fallback to legacy role column if role_id is not set
+        return self.role
+
+    def has_role(self, role_name):
         """Check if user has specific role"""
-        return self.role == role
+        # Check new RBAC system first
+        if self.role_obj:
+            return self.role_obj.name == role_name
+        # Fallback to legacy
+        return self.role == role_name
+        
+    def has_permission(self, perm_slug):
+        """Check if user has specific permission"""
+        if not self.role_obj:
+            # Legacy fallback: admin gets everything, staff gets limited
+            if self.role == 'admin':
+                return True
+            if self.role == 'staff':
+                # Define legacy staff permissions map if needed, or just return False for critical stuff
+                # For now, let's assume legacy staff has basic access logic handled by decorators
+                return False 
+            return False
+            
+        return self.role_obj.has_permission(perm_slug)
     
     def __repr__(self):
         return f'<User {self.username}>'

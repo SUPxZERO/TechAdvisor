@@ -3,34 +3,21 @@ from flask_login import login_required, current_user
 from app.models.user import User, AuditLog
 from app.models.product import Product, Brand, Category, Specification
 from app.models.rule import Rule, RuleCondition
+from app.models.role import Role, Permission
 from app.forms.product_forms import ProductForm, BrandForm
 from app.forms.rule_forms import RuleForm
+from app.forms.role_forms import RoleForm
+from app.forms.brand_forms import BrandForm
 from app import db
 from functools import wraps
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-def admin_required(f):
-    """Decorator to require admin role"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != 'admin':
-            flash('Admin access required', 'error')
-            return redirect(url_for('auth.login'))
-        return f(*args, **kwargs)
-    return decorated_function
+from app.utils.decorators import permission_required, admin_required, staff_required
 
+# Decorators moved to app/utils/decorators.py
 
-def staff_required(f):
-    """Decorator to require staff or admin role"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role not in ['admin', 'staff']:
-            flash('Staff access required', 'error')
-            return redirect(url_for('auth.login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 @admin_bp.route('/dashboard')
@@ -53,7 +40,7 @@ def dashboard():
 
 @admin_bp.route('/products')
 @login_required
-@staff_required
+@permission_required('product.view')
 def products():
     """Product listing with search and filters"""
     page = request.args.get('page', 1, type=int)
@@ -92,7 +79,7 @@ def products():
 
 @admin_bp.route('/products/add', methods=['GET', 'POST'])
 @login_required
-@staff_required
+@permission_required('product.create')
 def product_add():
     """Add new product"""
     form = ProductForm()
@@ -130,7 +117,7 @@ def product_add():
 
 @admin_bp.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
 @login_required
-@staff_required
+@permission_required('product.edit')
 def product_edit(product_id):
     """Edit existing product"""
     product = Product.query.get_or_404(product_id)
@@ -187,7 +174,7 @@ def product_edit(product_id):
 
 @admin_bp.route('/products/<int:product_id>/delete', methods=['POST', 'GET'])
 @login_required
-@staff_required
+@permission_required('product.delete')
 def product_delete(product_id):
     """Delete product"""
     product = Product.query.get_or_404(product_id)
@@ -215,7 +202,7 @@ def product_delete(product_id):
 
 @admin_bp.route('/rules')
 @login_required
-@staff_required
+@permission_required('rule.view')
 def rules():
     """Rule management with search and filters"""
     page = request.args.get('page', 1, type=int)
@@ -244,7 +231,7 @@ def rules():
 
 @admin_bp.route('/rules/add', methods=['GET', 'POST'])
 @login_required
-@staff_required
+@permission_required('rule.manage')
 def rule_add():
     """Add new rule"""
     form = RuleForm()
@@ -265,8 +252,8 @@ def rule_add():
         audit_log = AuditLog(
             user_id=current_user.id,
             action='create',
-            entity_type='Rule',
-            entity_id=rule.id,
+            table_name='rules',
+            record_id=rule.id,
             details=f'Created rule: {rule.name}'
         )
         db.session.add(audit_log)
@@ -280,7 +267,7 @@ def rule_add():
 
 @admin_bp.route('/rules/<int:rule_id>/edit', methods=['GET', 'POST'])
 @login_required
-@staff_required
+@permission_required('rule.manage')
 def rule_edit(rule_id):
     """Edit existing rule"""
     rule = Rule.query.get_or_404(rule_id)
@@ -323,8 +310,8 @@ def rule_edit(rule_id):
         audit_log = AuditLog(
             user_id=current_user.id,
             action='update',
-            entity_type='Rule',
-            entity_id=rule.id,
+            table_name='rules',
+            record_id=rule.id,
             details=f'Updated rule: {rule.name}'
         )
         db.session.add(audit_log)
@@ -338,7 +325,7 @@ def rule_edit(rule_id):
 
 @admin_bp.route('/rules/<int:rule_id>/delete', methods=['POST', 'GET'])
 @login_required
-@staff_required
+@permission_required('rule.manage')
 def rule_delete(rule_id):
     """Delete rule"""
     rule = Rule.query.get_or_404(rule_id)
@@ -351,8 +338,8 @@ def rule_delete(rule_id):
     audit_log = AuditLog(
         user_id=current_user.id,
         action='delete',
-        entity_type='Rule',
-        entity_id=rule.id,
+        table_name='rules',
+        record_id=rule.id,
         details=f'Deleted rule: {rule_name}'
     )
     db.session.add(audit_log)
@@ -366,7 +353,7 @@ def rule_delete(rule_id):
 
 @admin_bp.route('/users')
 @login_required
-@admin_required
+@permission_required('user.view')
 def users():
     """User management (admin only)"""
     page = request.args.get('page', 1, type=int)
@@ -374,3 +361,234 @@ def users():
         page=page, per_page=20, error_out=False
     )
     return render_template('admin/users.html', users=users)
+
+
+# Role Management Routes
+
+@admin_bp.route('/roles')
+@login_required
+@permission_required('role.view')
+def roles():
+    """Role management"""
+    roles = Role.query.order_by(Role.id).all()
+    return render_template('admin/roles.html', roles=roles)
+
+
+@admin_bp.route('/roles/add', methods=['GET', 'POST'])
+@login_required
+@permission_required('role.manage')
+def role_add():
+    """Add new role"""
+    form = RoleForm()
+    permissions = Permission.query.order_by(Permission.slug).all()
+    
+    if form.validate_on_submit():
+        role = Role(
+            name=form.name.data,
+            description=form.description.data,
+            is_system=False # Custom roles are not system
+        )
+        
+        # Handle permissions
+        selected_perms = request.form.getlist('permissions')
+        if selected_perms:
+            role.permissions = Permission.query.filter(Permission.id.in_(selected_perms)).all()
+            
+        db.session.add(role)
+        db.session.commit()
+        
+        # Log
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='create',
+            table_name='roles',
+            record_id=role.id,
+            details=f'Created role: {role.name}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'Role "{role.name}" created successfully!', 'success')
+        return redirect(url_for('admin.roles'))
+        
+    return render_template('admin/role_form.html', form=form, role=None, permissions=permissions)
+
+
+@admin_bp.route('/roles/<int:role_id>/edit', methods=['GET', 'POST'])
+@login_required
+@permission_required('role.manage')
+def role_edit(role_id):
+    """Edit existing role"""
+    role = Role.query.get_or_404(role_id)
+    form = RoleForm(obj=role)
+    permissions = Permission.query.order_by(Permission.slug).all()
+    
+    if form.validate_on_submit():
+        # Prevent editing name of system roles? Maybe allow description but warn on name.
+        if role.is_system and role.name != form.name.data:
+            flash('Cannot change name of system roles.', 'error')
+            return render_template('admin/role_form.html', form=form, role=role, permissions=permissions)
+            
+        role.name = form.name.data
+        role.description = form.description.data
+        
+        # Handle permissions
+        selected_perms = request.form.getlist('permissions')
+        # System roles might prevent removing critical permissions, but admin should be careful
+        role.permissions = Permission.query.filter(Permission.id.in_(selected_perms)).all()
+        
+        db.session.commit()
+        
+        # Log
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='update',
+            table_name='roles',
+            record_id=role.id,
+            details=f'Updated role: {role.name}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'Role "{role.name}" updated successfully!', 'success')
+        return redirect(url_for('admin.roles'))
+        
+    return render_template('admin/role_form.html', form=form, role=role, permissions=permissions)
+
+
+@admin_bp.route('/roles/<int:role_id>/delete', methods=['POST'])
+@login_required
+@permission_required('role.manage')
+def role_delete(role_id):
+    """Delete role"""
+    role = Role.query.get_or_404(role_id)
+    
+    if role.is_system:
+        flash('Cannot delete system role.', 'error')
+        return redirect(url_for('admin.roles'))
+        
+    if role.users.count() > 0:
+        flash('Cannot delete role assigned to users. Reassign them first.', 'error')
+        return redirect(url_for('admin.roles'))
+        
+    role_name = role.name
+    db.session.delete(role)
+    db.session.commit()
+    
+    # Log
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='delete',
+        table_name='roles',
+        record_id=role.id,
+        details=f'Deleted role: {role_name}'
+    )
+    db.session.add(audit_log)
+    db.session.commit()
+    
+    flash(f'Role "{role_name}" deleted successfully!', 'success')
+    return redirect(url_for('admin.roles'))
+
+
+# Brand Management Routes
+
+@admin_bp.route('/brands')
+@login_required
+@permission_required('brand.view')
+def brands():
+    """Brand management"""
+    brands = Brand.query.order_by(Brand.name).all()
+    return render_template('admin/brands.html', brands=brands)
+
+
+@admin_bp.route('/brands/add', methods=['GET', 'POST'])
+@login_required
+@permission_required('brand.manage')
+def brand_add():
+    """Add new brand"""
+    form = BrandForm()
+    
+    if form.validate_on_submit():
+        brand = Brand(
+            name=form.name.data,
+            logo_url=form.logo_url.data
+        )
+        db.session.add(brand)
+        db.session.commit()
+        
+        # Log
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='create',
+            table_name='brands',
+            record_id=brand.id,
+            details=f'Created brand: {brand.name}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'Brand "{brand.name}" created successfully!', 'success')
+        return redirect(url_for('admin.brands'))
+        
+    return render_template('admin/brand_form.html', form=form, brand=None)
+
+
+@admin_bp.route('/brands/<int:brand_id>/edit', methods=['GET', 'POST'])
+@login_required
+@permission_required('brand.manage')
+def brand_edit(brand_id):
+    """Edit existing brand"""
+    brand = Brand.query.get_or_404(brand_id)
+    form = BrandForm(obj=brand)
+    
+    if form.validate_on_submit():
+        brand.name = form.name.data
+        brand.logo_url = form.logo_url.data
+        db.session.commit()
+        
+        # Log
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='update',
+            table_name='brands',
+            record_id=brand.id,
+            details=f'Updated brand: {brand.name}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'Brand "{brand.name}" updated successfully!', 'success')
+        return redirect(url_for('admin.brands'))
+        
+    return render_template('admin/brand_form.html', form=form, brand=brand)
+
+
+@admin_bp.route('/brands/<int:brand_id>/delete', methods=['POST'])
+@login_required
+@permission_required('brand.manage')
+def brand_delete(brand_id):
+    """Delete brand"""
+    brand = Brand.query.get_or_404(brand_id)
+    
+    # Check if brand is attached to products
+    if brand.products.count() > 0:
+        flash(f'Cannot delete brand "{brand.name}" because it is associated with products.', 'error')
+        return redirect(url_for('admin.brands'))
+        
+    brand_name = brand.name
+    db.session.delete(brand)
+    db.session.commit()
+    
+    # Log
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='delete',
+        table_name='brands',
+        record_id=brand.id,
+        details=f'Deleted brand: {brand_name}'
+    )
+    db.session.add(audit_log)
+    db.session.commit()
+    
+    flash(f'Brand "{brand_name}" deleted successfully!', 'success')
+    return redirect(url_for('admin.brands'))

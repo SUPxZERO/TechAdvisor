@@ -50,7 +50,10 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-sm text-gray-500 mt-4">Apple, Samsung, Dell, HP...</p>
+                <a href="{{ url_for('admin.brands') }}"
+                    class="text-sm text-green-600 hover:text-green-800 mt-4 inline-block">
+                    View all brands →
+                </a>
             </div>
 
             <!-- Active Rules -->
@@ -132,6 +135,30 @@
                         </path>
                     </svg>
                     <span class="font-medium text-gray-900">Add User</span>
+                </a>
+                {% endif %}
+
+                {% if current_user.has_permission('role.manage') %}
+                <a href="{{ url_for('admin.roles') }}"
+                    class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all duration-200">
+                    <svg class="h-6 w-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-gray-900">Manage Roles</span>
+                </a>
+                {% endif %}
+
+                {% if current_user.has_permission('brand.view') %}
+                <a href="{{ url_for('admin.brands') }}"
+                    class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-pink-500 hover:bg-pink-50 transition-all duration-200">
+                    <svg class="h-6 w-6 text-pink-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-gray-900">Manage Brands</span>
                 </a>
                 {% endif %}
             </div>
