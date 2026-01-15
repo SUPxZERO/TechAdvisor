@@ -31,7 +31,7 @@ def seed_products():
                 'brand': 'Apple',
                 'price': Decimal('1199.99'),
                 'description': 'Premium flagship with titanium design and A17 Pro chip',
-                'image_url': 'https://via.placeholder.com/200x200?text=iPhone+15+Pro',
+                'image_url': 'https://i5.walmartimages.com/seo/Restored-Apple-iPhone-15-Pro-Max-256GB-AT-T-Blue-Titanium-MU693LL-A-Excellent-Condition_dd2d42c6-cc25-4bee-81ef-7847120498d5.663475b807d168a41e9082d258d9c7ce.jpeg',
                 'specs': {
                     'Processor': 'A17 Pro Chip',
                     'RAM': '8GB',
@@ -47,7 +47,7 @@ def seed_products():
                 'brand': 'Apple',
                 'price': Decimal('799.99'),
                 'description': 'Reliable daily driver with excellent camera',
-                'image_url': 'https://via.placeholder.com/200x200?text=iPhone+14',
+                'image_url': 'https://m.media-amazon.com/images/I/51twnyEBC8L.jpg',
                 'specs': {
                     'Processor': 'A15 Bionic',
                     'RAM': '6GB',
@@ -63,7 +63,7 @@ def seed_products():
                 'brand': 'Samsung',
                 'price': Decimal('1399.99'),
                 'description': 'Ultimate productivity powerhouse with S Pen',
-                'image_url': 'https://via.placeholder.com/200x200?text=Galaxy+S24+Ultra',
+                'image_url': 'https://angkormeas.com/wp-content/uploads/2022/05/S24-Ultrra_Global_v5.jpg?v=1721791628',
                 'specs': {
                     'Processor': 'Snapdragon 8 Gen 3',
                     'RAM': '12GB',

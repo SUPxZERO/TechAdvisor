@@ -27,30 +27,31 @@ class RecommendationService:
             Dictionary with recommendations and metadata
         """
         # Run inference engine
-        fired_recommendations = self.engine.forward_chain(user_input)
+        matched_rules = self.engine.infer(user_input)
         
-        if not fired_recommendations:
+        if not matched_rules:
             return {
                 'products': [],
                 'message': 'No matching products found. Try adjusting your criteria.',
-                'total_matches': 0
+                'total_matches': 0,
+                'fired_rules': 0
             }
         
         # Get products based on recommendations
-        products = self._fetch_products(fired_recommendations, user_input, limit)
+        products = self._fetch_products(matched_rules, user_input, limit)
         
         # Add reasoning to products
-        products_with_reasoning = self._add_reasoning(products, fired_recommendations)
+        products_with_reasoning = self._add_reasoning(products, matched_rules)
         
         return {
             'products': products_with_reasoning,
             'total_matches': len(products),
-            'fired_rules': len(fired_recommendations),
+            'fired_rules': len(matched_rules),
             'message': f'Found {len(products)} products matching your preferences'
         }
     
-    def _fetch_products(self, recommendations: List[Dict], user_input: Dict, limit: int) -> List[Product]:
-        """Fetch products based on fired rules and user input"""
+    def _fetch_products(self, matched_rules: List, user_input: Dict, limit: int) -> List[Product]:
+        """Fetch products based on matched rules and user input"""
         # Start with base query
         query = Product.query.filter_by(is_active=True)
         
@@ -62,11 +63,11 @@ class RecommendationService:
             except (ValueError, TypeError):
                 pass
         
-        # Apply category filter from recommendations
+        # Apply category filter from matched rules
         category_ids = set()
-        for rec in recommendations:
-            if rec.get('category_id'):
-                category_ids.add(rec['category_id'])
+        for rule in matched_rules:
+            if rule.category_id:
+                category_ids.add(rule.category_id)
         
         if category_ids:
             query = query.filter(Product.category_id.in_(category_ids))
@@ -74,26 +75,30 @@ class RecommendationService:
         # Apply brand filter if provided
         if 'preferred_brand' in user_input and user_input['preferred_brand']:
             brand_name = user_input['preferred_brand']
-            query = query.join(Product.brand).filter(
-                db.func.lower(Product.brand.has(name=brand_name))
-            )
+            from app.models.product import Brand
+            brand = Brand.query.filter(db.func.lower(Brand.name) == brand_name.lower()).first()
+            if brand:
+                query = query.filter_by(brand_id=brand.id)
         
         # Order by price and limit
         products = query.order_by(Product.price.asc()).limit(limit).all()
         
         return products
     
-    def _add_reasoning(self, products: List[Product], recommendations: List[Dict]) -> List[Dict]:
+    def _add_reasoning(self, products: List[Product], matched_rules: List) -> List[Dict]:
         """Add reasoning and confidence scores to product results"""
         results = []
         
         for product in products:
-            # Find matching recommendation for this product's category
-            matching_rec = None
-            for rec in recommendations:
-                if rec.get('category_id') == product.category_id:
-                    matching_rec = rec
+            # Find matching rule for this product's category
+            matching_rule = None
+            for rule in matched_rules:
+                if rule.category_id == product.category_id:
+                    matching_rule = rule
                     break
+            
+            # Calculate confidence based on priority
+            confidence = min(100, 50 + (matching_rule.priority if matching_rule else 50))
             
             product_dict = {
                 'id': product.id,
@@ -107,9 +112,9 @@ class RecommendationService:
                     {'key': spec.spec_key, 'value': spec.spec_value}
                     for spec in product.specifications
                 ],
-                'confidence': matching_rec['confidence'] if matching_rec else 50,
-                'reasoning': matching_rec['reasoning'] if matching_rec else 'Matches your budget and category',
-                'matched_rule': matching_rec['rule_name'] if matching_rec else None
+                'confidence': confidence,
+                'reasoning': f"Matches your {matching_rule.name}" if matching_rule else 'Matches your budget and category',
+                'matched_rule': matching_rule.name if matching_rule else None
             }
             
             results.append(product_dict)

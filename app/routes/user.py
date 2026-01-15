@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from app.models.product import Product, Brand, Category
 from app.services.recommendation_service import RecommendationService
+from app.forms.recommendation_forms import RecommendationForm
 from app import db
 
 user_bp = Blueprint('user', __name__)
@@ -15,28 +16,32 @@ def home():
 @user_bp.route('/recommend', methods=['GET', 'POST'])
 def recommend():
     """Recommendation questionnaire and results"""
-    if request.method == 'POST':
+    form = RecommendationForm()
+    
+    if form.validate_on_submit():
         # Collect user inputs
         user_inputs = {
-            'category': request.form.get('category'),
-            'max_budget': request.form.get('budget'),
-            'usage_type': request.form.get('usage_type'),
-            'preferred_brand': request.form.get('brand', 'Any'),
-            'requirements': request.form.getlist('requirements')
+            'category': form.category.data,
+            'budget': form.budget.data,
+            'usage_type': form.usage_type.data,
+            'preferred_brand': form.preferred_brand.data if form.preferred_brand.data else None
         }
         
         # Get recommendations
         rec_service = RecommendationService()
-        recommendations = rec_service.get_recommendations(user_inputs, limit=3)
+        recommendations = rec_service.get_recommendations(user_inputs, limit=9)
         
-        return render_template('user/results.html', 
-                             recommendations=recommendations,
-                             user_inputs=user_inputs)
+        # Store in session
+        session['last_preferences'] = user_inputs
+        
+        return render_template('user/results.html',
+                             products=recommendations.get('products', []),
+                             message=recommendations.get('message', ''),
+                             total_matches=recommendations.get('total_matches', 0),
+                             fired_rules=recommendations.get('fired_rules', 0))
     
     # GET request - show questionnaire
-    brands = Brand.query.all()
-    categories = Category.query.all()
-    return render_template('user/questionnaire.html', brands=brands, categories=categories)
+    return render_template('user/questionnaire.html', form=form)
 
 
 @user_bp.route('/compare')
