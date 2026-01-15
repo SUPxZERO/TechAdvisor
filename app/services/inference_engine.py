@@ -24,17 +24,18 @@ class InferenceEngine:
             return False
         
         try:
-            if operator == '==':
+            # Map operator names to symbols for comparison
+            if operator == 'equals' or operator == '==':
                 return str(actual).lower() == str(expected).lower()
-            elif operator == '!=':
+            elif operator == 'not_equals' or operator == '!=':
                 return str(actual).lower() != str(expected).lower()
-            elif operator == '<':
+            elif operator == 'less_than' or operator == '<':
                 return float(actual) < float(expected)
-            elif operator == '>':
+            elif operator == 'greater_than' or operator == '>':
                 return float(actual) > float(expected)
-            elif operator == '<=':
+            elif operator == 'less_equal' or operator == '<=':
                 return float(actual) <= float(expected)
-            elif operator == '>=':
+            elif operator == 'greater_equal' or operator == '>=':
                 return float(actual) >= float(expected)
             elif operator == 'in':
                 return str(actual).lower() in [v.strip().lower() for v in expected.split(',')]
@@ -53,8 +54,10 @@ class InferenceEngine:
             if not rule.is_active:
                 continue
             
+            # Convert to list to get count and iterate
+            conditions_list = list(rule.conditions)
             all_conditions_met = True
-            for condition in rule.conditions:
+            for condition in conditions_list:
                 if not self.evaluate_condition(condition, facts):
                     all_conditions_met = False
                     break

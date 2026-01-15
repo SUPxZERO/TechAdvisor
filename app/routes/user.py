@@ -19,9 +19,15 @@ def recommend():
     form = RecommendationForm()
     
     if form.validate_on_submit():
+        # Get category name from ID
+        category_id = form.category.data
+        category = Category.query.get(category_id)
+        category_name = category.name.lower() if category else None
+        
         # Collect user inputs
         user_inputs = {
-            'category': form.category.data,
+            'category': category_name,  # Convert ID to lowercase name
+            'category_id': category_id,  # Keep ID for product filtering
             'budget': form.budget.data,
             'usage_type': form.usage_type.data,
             'preferred_brand': form.preferred_brand.data if form.preferred_brand.data else None

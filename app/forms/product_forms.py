@@ -27,7 +27,7 @@ class ProductForm(FlaskForm):
                                render_kw={'placeholder': 'Detailed product description...', 'rows': 4})
     
     image_url = StringField('Image URL',
-                           validators=[Optional(), Length(max=255)],
+                           validators=[Optional(), Length(max=500)],
                            render_kw={'placeholder': 'https://example.com/image.jpg'})
     
     is_active = BooleanField('Active (visible to users)', default=True)

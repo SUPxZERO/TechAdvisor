@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS products (
     brand_id INT NOT NULL,
     category_id INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    image_url VARCHAR(255),
+    image_url VARCHAR(500),
     description TEXT,
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

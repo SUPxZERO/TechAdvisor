@@ -44,7 +44,7 @@ class Product(db.Model):
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
-    image_url = db.Column(db.String(255), nullable=True)
+    image_url = db.Column(db.String(500), nullable=True)
     description = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
