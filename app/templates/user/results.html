@@ -40,6 +40,13 @@
                     </div>
                     {% endif %}
 
+                    <!-- Comparison Checkbox -->
+                    <div class="absolute top-4 left-4">
+                        <input type="checkbox"
+                            class="compare-checkbox w-6 h-6 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
+                            data-product-id="{{ product.id }}" data-product-name="{{ product.name }}">
+                    </div>
+
                     <!-- Confidence Badge -->
                     <div class="absolute top-4 right-4">
                         <div
@@ -141,4 +148,69 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Floating Compare Button -->
+<div id="compareButton" class="fixed bottom-8 right-8 hidden z-50">
+    <button onclick="compareProducts()"
+        class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+            </path>
+        </svg>
+        <span>Compare Selected (<span id="compareCount">0</span>)</span>
+    </button>
+</div>
+
+<script>
+    const maxCompare = 4;
+    let selectedProducts = [];
+
+    function updateCompareButton() {
+        const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
+        selectedProducts = Array.from(checkboxes).map(cb => cb.dataset.productId);
+        const count = selectedProducts.length;
+
+        document.getElementById('compareCount').textContent = count;
+
+        const compareBtn = document.getElementById('compareButton');
+        if (count >= 2) {
+            compareBtn.classList.remove('hidden');
+        } else {
+            compareBtn.classList.add('hidden');
+        }
+    }
+
+    function compareProducts() {
+        if (selectedProducts.length < 2) {
+            alert('Please select at least 2 products to compare.');
+            return;
+        }
+        if (selectedProducts.length > maxCompare) {
+            alert(`You can compare up to ${maxCompare} products at a time.`);
+            return;
+        }
+
+        const ids = selectedProducts.join(',');
+        window.location.href = `/compare?ids=${ids}`;
+    }
+
+    // Add event listeners to all checkboxes
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.compare-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const checkedCount = document.querySelectorAll('.compare-checkbox:checked').length;
+
+                // Limit selection to maxCompare products
+                if (this.checked && checkedCount > maxCompare) {
+                    this.checked = false;
+                    alert(`You can only compare up to ${maxCompare} products at a time.`);
+                    return;
+                }
+
+                updateCompareButton();
+            });
+        });
+    });
+</script>
 {% endblock %}

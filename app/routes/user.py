@@ -52,14 +52,61 @@ def recommend():
 
 @user_bp.route('/compare')
 def compare():
-    """Product comparison page"""
-    product_id_1 = request.args.get('p1', type=int)
-    product_id_2 = request.args.get('p2', type=int)
+    """Compare multiple products side-by-side"""
+    from flask import flash
     
-    if not product_id_1 or not product_id_2:
+    # Get product IDs from query string
+    product_ids = request.args.get('ids', '')
+    
+    if not product_ids:
+        flash('Please select products to compare.', 'warning')
         return redirect(url_for('user.home'))
     
-    product1 = Product.query.get_or_404(product_id_1)
-    product2 = Product.query.get_or_404(product_id_2)
+    # Parse comma-separated IDs
+    try:
+        ids = [int(id.strip()) for id in product_ids.split(',') if id.strip()]
+    except ValueError:
+        flash('Invalid product IDs.', 'error')
+        return redirect(url_for('user.home'))
     
-    return render_template('user/compare.html', product1=product1, product2=product2)
+    # Validate number of products (2-4)
+    if len(ids) < 2:
+        flash('Please select at least 2 products to compare.', 'warning')
+        return redirect(url_for('user.home'))
+    if len(ids) > 4:
+        flash('You can compare up to 4 products at a time.', 'warning')
+        ids = ids[:4]
+    
+    # Fetch products with their specifications
+    products = Product.query.filter(Product.id.in_(ids)).all()
+    
+    if not products:
+        flash('No products found.', 'error')
+        return redirect(url_for('user.home'))
+    
+    # Build comparison data
+    comparison_data = []
+    all_spec_keys = set()
+    
+    for product in products:
+        specs = {spec.spec_key: spec.spec_value for spec in product.specifications}
+        all_spec_keys.update(specs.keys())
+        
+        comparison_data.append({
+            'id': product.id,
+            'name': product.name,
+            'brand': product.brand.name if product.brand else 'N/A',
+            'category': product.category.name if product.category else 'N/A',
+            'price': float(product.price),
+            'image_url': product.image_url or '/static/images/placeholder.png',
+            'description': product.description or '',
+            'specifications': specs
+        })
+    
+    # Sort specification keys for consistent display
+    sorted_spec_keys = sorted(all_spec_keys)
+    
+    return render_template('user/compare.html',
+                         products=comparison_data,
+                         spec_keys=sorted_spec_keys)
+
