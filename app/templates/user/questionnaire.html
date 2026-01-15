@@ -4,135 +4,191 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-600">Your Progress</span>
+                <span class="text-sm font-medium text-indigo-600"><span id="progressPercent">0</span>% Complete</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progressBar" class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+        </div>
+
         <!-- Hero Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">Find Your Perfect Device</h1>
-            <p class="text-xl text-gray-600">Answer a few questions and let our AI expert guide you to the best choice
+        <div class="text-center mb-12 animate-fade-in">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4 shadow-lg">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                Find Your Perfect Tech Product
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Answer 4 quick questions and our AI will recommend the best products for your needs
             </p>
         </div>
 
         <!-- Questionnaire Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-            <form method="POST" action="{{ url_for('user.recommend') }}">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 form-container">
+            <form method="POST" action="{{ url_for('user.recommend') }}" id="recommendForm">
                 {{ form.hidden_tag() }}
 
-                <div class="space-y-8">
-                    <!-- Category Selection -->
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">
-                            <span class="text-indigo-600">1.</span> {{ form.category.label.text }}
-                        </label>
-                        <div class="grid grid-cols-2 gap-4">
-                            {% for value, label in form.category.choices %}
-                            <label
-                                class="relative flex items-center justify-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200">
-                                <input type="radio" name="category" value="{{ value }}" class="sr-only peer" required>
-                                <div class="text-center peer-checked:text-indigo-600">
-                                    <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        {% if value == 'smartphone' %}
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                        </path>
-                                        {% else %}
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                        </path>
-                                        {% endif %}
-                                    </svg>
-                                    <p class="font-medium">{{ label }}</p>
-                                </div>
-                                <div
-                                    class="absolute inset-0 border-2 border-indigo-600 rounded-xl opacity-0 peer-checked:opacity-100">
-                                </div>
-                            </label>
-                            {% endfor %}
+                <!-- Question 1: Category -->
+                <div class="question-section mb-12" data-question="1">
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold mr-4">
+                            1
                         </div>
-                        {% if form.category.errors %}
-                        {% for error in form.category.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                        {% endif %}
+                        <h2 class="text-2xl font-bold text-gray-900">What type of device are you looking for?</h2>
                     </div>
-
-                    <!-- Budget Slider -->
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">
-                            <span class="text-indigo-600">2.</span> {{ form.budget.label.text }}
-                        </label>
-                        <div class="relative">
-                            {{ form.budget(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
-                            focus:ring-2 focus:ring-indigo-500 focus:border-transparent", id="budget-input") }}
-                            <div class="mt-4 flex justify-between text-sm text-gray-500">
-                                <span>$100</span>
-                                <span id="budget-display" class="font-semibold text-indigo-600 text-base"></span>
-                                <span>$10,000</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for value, label in form.category.choices %}
+                        <label class="category-option group relative flex flex-col items-center p-8 border-3 border-gray-200 rounded-2xl cursor-pointer hover:border-indigo-400 hover:shadow-lg transition-all duration-300">
+                            <input type="radio" name="category" value="{{ value }}" class="sr-only peer" required>
+                            
+                            <!-- Icon -->
+                            <div class="w-20 h-20 mb-4 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 peer-checked:from-indigo-500 peer-checked:to-purple-600">
+                                <svg class="w-10 h-10 text-indigo-600 group-hover:text-indigo-700 peer-checked:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {% if value == '1' %}  {# Smartphone #}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                    {% else %}  {# Laptop #}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    {% endif %}
+                                </svg>
                             </div>
-                        </div>
-                        {% if form.budget.errors %}
-                        {% for error in form.budget.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    <!-- Usage Type -->
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">
-                            <span class="text-indigo-600">3.</span> {{ form.usage_type.label.text }}
+                            
+                            <!-- Label -->
+                            <span class="text-xl font-semibold text-gray-700 group-hover:text-indigo-600 peer-checked:text-indigo-600 transition-colors">{{ label }}</span>
+                            
+                            <!-- Checkmark -->
+                            <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 group-hover:border-indigo-400 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center transition-all">
+                                <svg class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
                         </label>
-                        {{ form.usage_type(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
-                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
-                        {% if form.usage_type.errors %}
-                        {% for error in form.usage_type.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
                         {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    <!-- Preferred Brand -->
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">
-                            <span class="text-indigo-600">4.</span> {{ form.preferred_brand.label.text }}
-                        </label>
-                        {{ form.preferred_brand(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
-                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
-                        {% if form.preferred_brand.errors %}
-                        {% for error in form.preferred_brand.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    <!-- Additional Notes -->
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">
-                            <span class="text-indigo-600">5.</span> {{ form.additional_notes.label.text }}
-                        </label>
-                        {{ form.additional_notes(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
-                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
-                        {% if form.additional_notes.errors %}
-                        {% for error in form.additional_notes.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                        {% endif %}
                     </div>
                 </div>
 
+                <!-- Question 2: Budget Slider -->
+                <div class="question-section mb-12 opacity-50" data-question="2">
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold mr-4">
+                            2
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">What's your budget?</h2>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8">
+                        <!-- Budget Display -->
+                        <div class="text-center mb-8">
+                            <div class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
+                                $<span id="budgetValue">5000</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Slide to adjust your budget</p>
+                        </div>
+                        
+                        <!-- Custom Range Slider -->
+                        <div class="relative">
+                            <input type="range" 
+                                   name="budget" 
+                                   id="budgetSlider" 
+                                   min="100" 
+                                   max="5000" 
+                                   value="5000" 
+                                   step="50"
+                                   class="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer slider">
+                            
+                            <div class="flex justify-between mt-4 text-sm text-gray-500">
+                                <span class="font-medium">$100</span>
+                                <span class="font-medium">$5,000</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Budget Presets -->
+                        <div class="grid grid-cols-3 gap-3 mt-6">
+                            <button type="button" class="budget-preset px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-100 transition-colors" data-value="500">
+                                Under $500
+                            </button>
+                            <button type="button" class="budget-preset px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-100 transition-colors" data-value="1500">
+                                $500-$1,500
+                            </button>
+                            <button type="button" class="budget-preset px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-100 transition-colors" data-value="3000">
+                                $1,500+
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3: Usage Type -->
+                <div class="question-section mb-12 opacity-50" data-question="3">
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold mr-4">
+                            3
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">How will you primarily use it?</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {% for value, label in form.usage_type.choices %}
+                        <label class="usage-option relative flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all duration-200 group">
+                            <input type="radio" name="usage_type" value="{{ value }}" class="sr-only peer" required>
+                            
+                            <div class="w-12 h-12 mb-3 rounded-full bg-indigo-100 flex items-center justify-center group-hover:bg-indigo-200 peer-checked:bg-indigo-600 transition-colors">
+                                <svg class="w-6 h-6 text-indigo-600 peer-checked:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {% if value == 'everyday' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    {% elif value == 'business' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    {% elif value == 'gaming' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>
+                                    {% else %}  {# creative #}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                                    {% endif %}
+                                </svg>
+                            </div>
+                            
+                            <span class="text-sm font-medium text-gray-700 text-center group-hover:text-indigo-600 peer-checked:text-indigo-600">
+                                {{ label }}
+                            </span>
+                            
+                            <div class="absolute inset-0 border-2 border-indigo-600 rounded-xl opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Question 4: Brand Preference -->
+                <div class="question-section mb-12 opacity-50" data-question="4">
+                    <div class="flex items-center mb-6">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold mr-4">
+                            4
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">Any brand preference? <span class="text-lg font-normal text-gray-500">(Optional)</span></h2>
+                    </div>
+                    
+                    {{ form.preferred_brand(class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all", placeholder="e.g., Apple, Samsung, Dell...") }}
+                </div>
+
                 <!-- Submit Button -->
-                <div class="mt-10 text-center">
+                <div class="text-center pt-6">
                     <button type="submit" id="submitBtn"
-                        class="w-full sm:w-auto px-12 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <span id="btnText">Get Recommendations</span>
-                        <span id="btnLoader" class="hidden">
-                            <svg class="inline w-5 h-5 mr-2 text-white animate-spin" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
+                        class="group relative inline-flex items-center justify-center px-12 py-5 text-lg font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-2xl hover:shadow-3xl">
+                        <span id="btnText" class="flex items-center">
+                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Get My Recommendations
+                        </span>
+                        <span id="btnLoader" class="hidden flex items-center">
+                            <svg class="animate-spin h-6 w-6 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             Finding your perfect matches...
                         </span>
@@ -142,27 +198,234 @@
         </div>
 
         <!-- Trust Indicators -->
-        <div class="mt-8 text-center text-sm text-gray-500">
-            <p>🔒 Your preferences are private and secure</p>
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-gray-700">100% Free</p>
+                <p class="text-xs text-gray-500">No credit card required</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-gray-700">AI-Powered</p>
+                <p class="text-xs text-gray-500">Expert system logic</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-gray-700">Under 2 Minutes</p>
+                <p class="text-xs text-gray-500">Quick & easy</p>
+            </div>
         </div>
     </div>
 </div>
 
+<style>
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+}
+
+/* Custom Range Slider Styles */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+    transition: all 0.2s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+}
+
+.slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+    transition: all 0.2s;
+}
+
+.slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Smooth transitions */
+.question-section {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.question-section.active {
+    opacity: 1 !important;
+    transform: translateY(0);
+}
+</style>
+
 <script>
-    // Update budget display
-    const budgetInput = document.getElementById('budget-input');
-    const budgetDisplay = document.getElementById('budget-display');
-
-    if (budgetInput) {
-        budgetInput.addEventListener('input', function () {
-            const value = this.value || '0';
-            budgetDisplay.textContent = '$' + parseInt(value).toLocaleString();
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recommendForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    const budgetSlider = document.getElementById('budgetSlider');
+    const budgetValue = document.getElementById('budgetValue');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    let questionsAnswered = 0;
+    const totalQuestions = 4;
+    
+    // Budget slider functionality
+    if (budgetSlider && budgetValue) {
+        budgetSlider.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            budgetValue.textContent = value.toLocaleString();
         });
-
-        // Initialize display
-        if (budgetInput.value) {
-            budgetDisplay.textContent = '$' + parseInt(budgetInput.value).toLocaleString();
-        }
+        
+        // Budget presets
+        document.querySelectorAll('.budget-preset').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const value = this.dataset.value;
+                budgetSlider.value = value;
+                budgetValue.textContent = parseInt(value).toLocaleString();
+            });
+        });
     }
+    
+    // Progressive disclosure - enable sections as previous ones are completed
+    function updateProgress() {
+        const percentage = Math.round((questionsAnswered / totalQuestions) * 100);
+        progressBar.style.width = percentage + '%';
+        progressPercent.textContent = percentage;
+        
+        // Enable next question
+        document.querySelectorAll('.question-section').forEach((section, index) => {
+            if (index <= questionsAnswered) {
+                section.classList.add('active');
+                section.style.opacity = '1';
+            }
+        });
+    }
+    
+    // Category selection
+    document.querySelectorAll('input[name="category"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (questionsAnswered < 1) {
+                questionsAnswered = 1;
+                updateProgress();
+                
+                // Smooth scroll to budget section
+                setTimeout(() => {
+                    document.querySelector('[data-question="2"]').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
+            }
+        });
+    });
+    
+    // Budget slider interaction
+    if (budgetSlider) {
+        budgetSlider.addEventListener('change', function() {
+            if (questionsAnswered < 2) {
+                questionsAnswered = 2;
+                updateProgress();
+                
+                setTimeout(() => {
+                    document.querySelector('[data-question="3"]').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
+            }
+        });
+    }
+    
+    // Usage type selection
+    document.querySelectorAll('input[name="usage_type"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (questionsAnswered < 3) {
+                questionsAnswered = 3;
+                updateProgress();
+                
+                setTimeout(() => {
+                    document.querySelector('[data-question="4"]').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
+            }
+        });
+    });
+    
+    // Brand preference (optional, so complete on focus)
+    const brandInput = document.querySelector('input[name="preferred_brand"]');
+    if (brandInput) {
+        brandInput.addEventListener('focus', function() {
+            if (questionsAnswered < 4) {
+                questionsAnswered = 4;
+                updateProgress();
+            }
+        });
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        const categorySelected = document.querySelector('input[name="category"]:checked');
+        const usageSelected = document.querySelector('input[name="usage_type"]:checked');
+        
+        if (!categorySelected) {
+            e.preventDefault();
+            alert('Please select a device category');
+            document.querySelector('[data-question="1"]').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        
+        if (!usageSelected) {
+            e.preventDefault();
+            alert('Please select how you\'ll use the device');
+            document.querySelector('[data-question="3"]').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.classList.add('hidden');
+        btnLoader.classList.remove('hidden');
+    });
+    
+    // Initial animation
+    setTimeout(() => {
+        document.querySelector('.form-container').style.opacity = '1';
+        document.querySelector('.form-container').style.transform = 'translateY(0)';
+        updateProgress();
+    }, 100);
+});
 </script>
+
 {% endblock %}
