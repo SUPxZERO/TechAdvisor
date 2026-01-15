@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - TechAdvisor{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="gradient-bg text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6">
+                Find Your Perfect Device
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-indigo-100">
+                Smart AI-powered recommendations for smartphones and laptops
+            </p>
+            <p class="text-lg mb-10 text-indigo-50 max-w-2xl mx-auto">
+                Answer 5 simple questions and let our expert system analyze thousands of products to find the perfect
+                match for your needs and budget.
+            </p>
+            <a href="{{ url_for('user.recommend') }}"
+                class="inline-block bg-white text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                Get Recommendations Now →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p class="text-gray-600">Our AI-powered expert system makes tech shopping simple</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200">
+                <div class="flex justify-center mb-4">
+                    <div class="bg-indigo-100 rounded-full p-4">
+                        <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3 text-center">Answer 5 Questions</h3>
+                <p class="text-gray-600 text-center">Tell us about your budget, usage type, and preferences in just 5
+                    simple questions.</p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200">
+                <div class="flex justify-center mb-4">
+                    <div class="bg-indigo-100 rounded-full p-4">
+                        <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3 text-center">AI Analysis</h3>
+                <p class="text-gray-600 text-center">Our expert system uses advanced algorithms to match your needs with
+                    50+ products.</p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200">
+                <div class="flex justify-center mb-4">
+                    <div class="bg-indigo-100 rounded-full p-4">
+                        <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3 text-center">Get Top 3 Picks</h3>
+                <p class="text-gray-600 text-center">Receive personalized recommendations with detailed explanations and
+                    side-by-side comparisons.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Benefits Section -->
+<div class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Why Choose TechAdvisor?</h2>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <svg class="h-6 w-6 text-green-500 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Unbiased Recommendations</h4>
+                            <p class="text-gray-600">No commissions, no hidden agendas - just honest advice</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="h-6 w-6 text-green-500 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Save Time & Money</h4>
+                            <p class="text-gray-600">Skip hours of research - get instant expert recommendations</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="h-6 w-6 text-green-500 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Smart Comparisons</h4>
+                            <p class="text-gray-600">Compare products side-by-side with highlighted differences</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="h-6 w-6 text-green-500 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">No Login Required</h4>
+                            <p class="text-gray-600">Start getting recommendations immediately - no account needed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+                <h3 class="text-2xl font-bold mb-4">Ready to find your perfect device?</h3>
+                <p class="mb-6 text-indigo-100">Join thousands of satisfied users who found exactly what they need.</p>
+                <a href="{{ url_for('user.recommend') }}"
+                    class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
+                    Start Now - It's Free!
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-gray-50 py-16">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Stop Researching. Start Deciding.</h2>
+        <p class="text-xl text-gray-600 mb-8">Let our expert system do the heavy lifting for you.</p>
+        <a href="{{ url_for('user.recommend') }}"
+            class="inline-block bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors duration-200 shadow-lg">
+            Get Your Recommendations →
+        </a>
+    </div>
+</div>
+{% endblock %}
