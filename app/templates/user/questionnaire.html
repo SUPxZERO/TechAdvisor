@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Get Recommendations - TechAdvisor{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Find Your Perfect Device</h1>
+            <p class="text-xl text-gray-600">Answer a few questions and let our AI expert guide you to the best choice
+            </p>
+        </div>
+
+        <!-- Questionnaire Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <form method="POST" action="{{ url_for('user.recommend') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="space-y-8">
+                    <!-- Category Selection -->
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">
+                            <span class="text-indigo-600">1.</span> {{ form.category.label.text }}
+                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            {% for value, label in form.category.choices %}
+                            <label
+                                class="relative flex items-center justify-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200">
+                                <input type="radio" name="category" value="{{ value }}" class="sr-only peer" required>
+                                <div class="text-center peer-checked:text-indigo-600">
+                                    <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        {% if value == 'smartphone' %}
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                        </path>
+                                        {% else %}
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                        {% endif %}
+                                    </svg>
+                                    <p class="font-medium">{{ label }}</p>
+                                </div>
+                                <div
+                                    class="absolute inset-0 border-2 border-indigo-600 rounded-xl opacity-0 peer-checked:opacity-100">
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% if form.category.errors %}
+                        {% for error in form.category.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Budget Slider -->
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">
+                            <span class="text-indigo-600">2.</span> {{ form.budget.label.text }}
+                        </label>
+                        <div class="relative">
+                            {{ form.budget(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
+                            focus:ring-2 focus:ring-indigo-500 focus:border-transparent", id="budget-input") }}
+                            <div class="mt-4 flex justify-between text-sm text-gray-500">
+                                <span>$100</span>
+                                <span id="budget-display" class="font-semibold text-indigo-600 text-base"></span>
+                                <span>$10,000</span>
+                            </div>
+                        </div>
+                        {% if form.budget.errors %}
+                        {% for error in form.budget.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Usage Type -->
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">
+                            <span class="text-indigo-600">3.</span> {{ form.usage_type.label.text }}
+                        </label>
+                        {{ form.usage_type(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
+                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
+                        {% if form.usage_type.errors %}
+                        {% for error in form.usage_type.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Preferred Brand -->
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">
+                            <span class="text-indigo-600">4.</span> {{ form.preferred_brand.label.text }}
+                        </label>
+                        {{ form.preferred_brand(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
+                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
+                        {% if form.preferred_brand.errors %}
+                        {% for error in form.preferred_brand.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Additional Notes -->
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">
+                            <span class="text-indigo-600">5.</span> {{ form.additional_notes.label.text }}
+                        </label>
+                        {{ form.additional_notes(class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl
+                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
+                        {% if form.additional_notes.errors %}
+                        {% for error in form.additional_notes.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-10">
+                    {{ form.submit(class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700
+                    hover:to-purple-700 text-white text-lg font-semibold py-4 rounded-xl shadow-lg transition-all
+                    duration-200 transform hover:scale-105") }}
+                </div>
+            </form>
+        </div>
+
+        <!-- Trust Indicators -->
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>🔒 Your preferences are private and secure</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update budget display
+    const budgetInput = document.getElementById('budget-input');
+    const budgetDisplay = document.getElementById('budget-display');
+
+    if (budgetInput) {
+        budgetInput.addEventListener('input', function () {
+            const value = this.value || '0';
+            budgetDisplay.textContent = '$' + parseInt(value).toLocaleString();
+        });
+
+        // Initialize display
+        if (budgetInput.value) {
+            budgetDisplay.textContent = '$' + parseInt(budgetInput.value).toLocaleString();
+        }
+    }
+</script>
+{% endblock %}
