@@ -1,0 +1,44 @@
+============================================================
+CATEGORY FILTER TEST
+============================================================
+
+[TEST 1] Requesting SMARTPHONES (Category ID: 1 )
+------------------------------------------------------------
+Total products found: 10
+Fired rules: 1
+
+Products returned:
+  - Xiaomi Redmi 14C (Category: Smartphone, Price: $105.0)
+  - Redmi A3 (Category: Smartphone, Price: $125.0)
+  - Samsung Galaxy A05 (Category: Smartphone, Price: $139.99)
+  - Xiaomi Redmi Note 13 5G (Category: Smartphone, Price: $199.99)
+  - Samsung Galaxy A15 5G (Category: Smartphone, Price: $229.99)
+  - Samsung Galaxy A26 5G (Category: Smartphone, Price: $299.99)
+  - Xiaomi Redmi Note 13 Pro+ 5G (Category: Smartphone, Price: $399.99)
+  - Samsung Galaxy A54 5G 128GB (Category: Smartphone, Price: $449.99)
+  - Samsung Galaxy A56 5G 128GB (Category: Smartphone, Price: $499.99)
+  - Xiaomi 13T Pro 512GB (Category: Smartphone, Price: $649.99)
+[PASS] Only smartphones returned (or no products)
+
+
+[TEST 2] Requesting LAPTOPS (Category ID: 2 )
+------------------------------------------------------------
+Total products found: 10
+Fired rules: 1
+
+Products returned:
+  - HP Chromebook 14a (Category: Laptop, Price: $229.99)
+  - Acer Chromebook Spin 312 (Category: Laptop, Price: $249.99)
+  - Acer Chromebook Plus 515 (Category: Laptop, Price: $299.99)
+  - Lenovo Chromebook Duet 11 Gen 9 (Category: Laptop, Price: $299.99)
+  - HP Chromebook Plus 15.6" (Category: Laptop, Price: $329.99)
+  - Lenovo IdeaPad Flex 5i Chromebook Plus (Category: Laptop, Price: $379.99)
+  - Acer Aspire 5 Gaming (Integrated) (Category: Laptop, Price: $449.99)
+  - HP 15 (Intel Core i5) (Category: Laptop, Price: $499.99)
+  - Lenovo IdeaPad Gaming 3 (GTX 1650) (Category: Laptop, Price: $579.99)
+  - MSI GF63 Thin (GTX 1650) (Category: Laptop, Price: $589.99)
+[PASS] Only laptops returned (or no products)
+
+============================================================
+TEST COMPLETE
+============================================================

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from app.models.product import Product, Brand, Category
 from app.services.recommendation_service import RecommendationService
+from app.services.comparison_service import ComparisonService
 from app.forms.recommendation_forms import RecommendationForm
 from app import db
 
@@ -19,15 +20,16 @@ def recommend():
     form = RecommendationForm()
     
     if form.validate_on_submit():
-        # Get category name from ID
-        category_id = form.category.data
-        category = Category.query.get(category_id)
-        category_name = category.name.lower() if category else None
+        # Get category from form data (e.g., 'smartphone' or 'laptop')
+        category_value = form.category.data  # This is a string like 'smartphone' or 'laptop'
+        
+        # Look up the category in the database by name
+        category = Category.query.filter(db.func.lower(Category.name) == category_value.lower()).first()
         
         # Collect user inputs
         user_inputs = {
-            'category': category_name,  # Convert ID to lowercase name
-            'category_id': category_id,  # Keep ID for product filtering
+            'category': category_value.lower(),  # Use the form value as category name
+            'category_id': category.id if category else None,  # Get the actual ID from database
             'budget': form.budget.data,
             'usage_type': form.usage_type.data,
             'preferred_brand': form.preferred_brand.data if form.preferred_brand.data else None
@@ -109,6 +111,49 @@ def compare():
     return render_template('user/compare.html',
                          products=comparison_data,
                          spec_keys=sorted_spec_keys)
+
+
+@user_bp.route('/compare-analysis')
+def compare_analysis():
+    """Pros & Cons comparison for exactly 2 products"""
+    from flask import flash
+    
+    # Get product IDs from query string
+    product_ids = request.args.get('ids', '')
+    
+    if not product_ids:
+        flash('Please select products to compare.', 'warning')
+        return redirect(url_for('user.home'))
+    
+    # Parse comma-separated IDs
+    try:
+        ids = [int(id.strip()) for id in product_ids.split(',') if id.strip()]
+    except ValueError:
+        flash('Invalid product IDs.', 'error')
+        return redirect(url_for('user.home'))
+    
+    # Validate exactly 2 products
+    if len(ids) != 2:
+        flash('Please select exactly 2 products for Pros & Cons analysis.', 'warning')
+        return redirect(url_for('user.home'))
+    
+    # Fetch products
+    products = Product.query.filter(Product.id.in_(ids)).all()
+    
+    if len(products) != 2:
+        flash('One or more selected products could not be found.', 'error')
+        return redirect(url_for('user.home'))
+    
+    # Get user preferences from session
+    user_preferences = session.get('last_preferences', {})
+    
+    # Perform analysis
+    comp_service = ComparisonService()
+    # pass products in the order they were requested if possible, strictly speaking the query result order isn't guaranteed relative to ID list order without explicit ordering
+    # but for comparison it doesn't matter much which is p1 and p2 initially
+    analysis_data = comp_service.compare_two_products(products[0], products[1], user_preferences)
+    
+    return render_template('user/comparison_analysis.html', **analysis_data)
 
 
 @user_bp.route('/product/<int:product_id>')

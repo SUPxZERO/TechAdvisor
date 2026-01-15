@@ -78,8 +78,17 @@ class InferenceEngine:
         for key, value in user_inputs.items():
             self.add_fact(key, value)
         
-        # Get all active rules
-        rules = Rule.query.filter_by(is_active=True).all()
+        # Get all active rules, filtered by category if specified
+        query = Rule.query.filter_by(is_active=True)
+        
+        # If user specified a category, only get rules for that category
+        if 'category_id' in user_inputs and user_inputs['category_id']:
+            query = query.filter(
+                (Rule.category_id == user_inputs['category_id']) | 
+                (Rule.category_id == None)  # Include generic rules with no category
+            )
+        
+        rules = query.all()
         
         # Match rules against facts
         self.matched_rules = self.match_rules(rules, self.working_memory)

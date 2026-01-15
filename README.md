@@ -42,6 +42,8 @@ TechAdvisor/
 - **Smart Questionnaire**: Answer 5 simple questions to get personalized recommendations
 - **Top 3 Recommendations**: Get the best products with detailed explanations
 - **Product Comparison**: Compare two products side-by-side
+   - **Specs Comparison**: Compare up to 4 products
+   - **Pros & Cons Analysis**: Deep dive into 2 products with expert insights
 - **No Login Required**: Instant access for end users
 
 ### For Admins/Staff

@@ -63,12 +63,20 @@ class RecommendationService:
             except (ValueError, TypeError):
                 pass
         
-        # Apply category filter from matched rules
+        # Apply category filter - STRICT enforcement of user's selected category
         category_ids = set()
-        for rule in matched_rules:
-            if rule.category_id:
-                category_ids.add(rule.category_id)
         
+        # First priority: Use the explicit category_id from user input
+        if 'category_id' in user_input and user_input['category_id']:
+            # User has specified a category - use ONLY this category
+            category_ids.add(user_input['category_id'])
+        elif matched_rules:
+            # If user didn't specify category, use categories from matched rules
+            for rule in matched_rules:
+                if rule.category_id:
+                    category_ids.add(rule.category_id)
+        
+        # Apply the category filter to the query
         if category_ids:
             query = query.filter(Product.category_id.in_(category_ids))
         
@@ -100,6 +108,26 @@ class RecommendationService:
             # Calculate confidence based on priority
             confidence = min(100, 50 + (matching_rule.priority if matching_rule else 50))
             
+            # Build detailed reasoning
+            reasoning_points = []
+            
+            # Budget reasoning
+            budget_text = self._get_budget_reasoning(product.price)
+            if budget_text:
+                reasoning_points.append(budget_text)
+            
+            # Usage match reasoning
+            if matching_rule:
+                reasoning_points.append(f"Optimized for your {matching_rule.description.lower()}")
+            
+            # Highlight key features
+            key_features = self._extract_key_features(product)
+            if key_features:
+                reasoning_points.append(f"Features: {key_features}")
+            
+            # Combine reasoning points
+            full_reasoning = reasoning_points[0] if reasoning_points else "Matches your requirements"
+            
             product_dict = {
                 'id': product.id,
                 'name': product.name,
@@ -113,7 +141,8 @@ class RecommendationService:
                     for spec in product.specifications
                 ],
                 'confidence': confidence,
-                'reasoning': f"Matches your {matching_rule.name}" if matching_rule else 'Matches your budget and category',
+                'reasoning': full_reasoning,
+                'reasoning_points': reasoning_points,  # Detailed list for UI
                 'matched_rule': matching_rule.name if matching_rule else None
             }
             
@@ -123,6 +152,29 @@ class RecommendationService:
         results.sort(key=lambda x: x['confidence'], reverse=True)
         
         return results
+    
+    def _get_budget_reasoning(self, price: float) -> str:
+        """Generate reasoning text for budget match"""
+        # This will be enhanced with actual user budget in the future
+        if price < 300:
+            return "Excellent value - highly affordable"
+        elif price < 600:
+            return "Great budget option with good features"
+        elif price < 1000:
+            return "Mid-range pricing with premium features"
+        else:
+            return "Premium pricing reflects high-end specifications"
+    
+    def _extract_key_features(self, product: Product) -> str:
+        """Extract and format key product features"""
+        features = []
+        
+        # Look for important specs
+        for spec in product.specifications[:3]:  # Top 3 specs
+            if any(keyword in spec.spec_key.lower() for keyword in ['processor', 'ram', 'storage', 'display', 'camera', 'battery']):
+                features.append(f"{spec.spec_key}: {spec.spec_value}")
+        
+        return ", ".join(features) if features else ""
     
     def calculate_match_percentage(self, product: Product, user_input: Dict) -> int:
         """Calculate how well a product matches user preferences (0-100)"""
