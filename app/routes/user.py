@@ -110,3 +110,50 @@ def compare():
                          products=comparison_data,
                          spec_keys=sorted_spec_keys)
 
+
+@user_bp.route('/product/<int:product_id>')
+def product_detail(product_id):
+    """Display detailed view of a single product"""
+    from flask import flash
+    
+    # Fetch product with all relationships
+    product = Product.query.get_or_404(product_id)
+    
+    # Get specifications as a dictionary
+    specs = {spec.spec_key: spec.spec_value for spec in product.specifications}
+    
+    # Group specifications by category for better display
+    spec_categories = {
+        'Performance': ['Processor', 'RAM', 'Graphics', 'Storage', 'SSD'],
+        'Display': ['Display', 'Screen', 'Resolution'],
+        'Camera': ['Camera', 'Front Camera', 'Video'],
+        'Battery & Power': ['Battery', 'Charging', 'Power'],
+        'System': ['OS', 'Operating System'],
+        'Physical': ['Weight', 'Dimensions', 'Build']
+    }
+    
+    # Categorize specs
+    categorized_specs = {}
+    uncategorized_specs = {}
+    
+    for key, value in specs.items():
+        categorized = False
+        for category, keywords in spec_categories.items():
+            if any(keyword.lower() in key.lower() for keyword in keywords):
+                if category not in categorized_specs:
+                    categorized_specs[category] = {}
+                categorized_specs[category][key] = value
+                categorized = True
+                break
+        if not categorized:
+            uncategorized_specs[key] = value
+    
+    # Add uncategorized to "Other" category if exists
+    if uncategorized_specs:
+        categorized_specs['Other'] = uncategorized_specs
+    
+    return render_template('user/product_detail.html',
+                         product=product,
+                         specs=specs,
+                         categorized_specs=categorized_specs)
+
