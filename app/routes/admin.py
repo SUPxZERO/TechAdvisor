@@ -4,6 +4,7 @@ from app.models.user import User, AuditLog
 from app.models.product import Product, Brand, Category, Specification
 from app.models.rule import Rule, RuleCondition
 from app.forms.product_forms import ProductForm, BrandForm
+from app.forms.rule_forms import RuleForm
 from app import db
 from functools import wraps
 
@@ -216,12 +217,151 @@ def product_delete(product_id):
 @login_required
 @staff_required
 def rules():
-    """Rule management"""
+    """Rule management with search and filters"""
     page = request.args.get('page', 1, type=int)
-    rules = Rule.query.order_by(Rule.priority.desc()).paginate(
+    search = request.args.get('search', '')
+    status = request.args.get('status', '')
+    
+    query = Rule.query
+    
+    # Apply search filter
+    if search:
+        query = query.filter(Rule.name.ilike(f'%{search}%'))
+    
+    # Apply status filter
+    if status == 'active':
+        query = query.filter_by(is_active=True)
+    elif status == 'inactive':
+        query = query.filter_by(is_active=False)
+    
+    # Paginate results
+    rules = query.order_by(Rule.priority.desc()).paginate(
         page=page, per_page=20, error_out=False
     )
+    
     return render_template('admin/rules.html', rules=rules)
+
+
+@admin_bp.route('/rules/add', methods=['GET', 'POST'])
+@login_required
+@staff_required
+def rule_add():
+    """Add new rule"""
+    form = RuleForm()
+    
+    if form.validate_on_submit():
+        rule = Rule(
+            name=form.name.data,
+            description=form.description.data,
+            priority=form.priority.data,
+            category_id=form.category_id.data,
+            is_active=form.is_active.data
+        )
+        
+        db.session.add(rule)
+        db.session.commit()
+        
+        # Log the action
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='create',
+            entity_type='Rule',
+            entity_id=rule.id,
+            details=f'Created rule: {rule.name}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'Rule "{rule.name}" created successfully!', 'success')
+        return redirect(url_for('admin.rules'))
+    
+    return render_template('admin/rule_form.html', form=form, rule=None)
+
+
+@admin_bp.route('/rules/<int:rule_id>/edit', methods=['GET', 'POST'])
+@login_required
+@staff_required
+def rule_edit(rule_id):
+    """Edit existing rule"""
+    rule = Rule.query.get_or_404(rule_id)
+    form = RuleForm(obj=rule)
+    
+    if form.validate_on_submit():
+        rule.name = form.name.data
+        rule.description = form.description.data
+        rule.priority = form.priority.data
+        rule.category_id = form.category_id.data
+        rule.is_active = form.is_active.data
+        
+        # Handle conditions
+        RuleCondition.query.filter_by(rule_id=rule.id).delete()
+        
+        cond_index = 0
+        while True:
+            cond_key = request.form.get(f'cond_key_{cond_index}')
+            cond_operator = request.form.get(f'cond_operator_{cond_index}')
+            cond_value = request.form.get(f'cond_value_{cond_index}')
+            
+            if cond_key is None:
+                break
+            
+            if cond_key and cond_operator and cond_value:
+                condition = RuleCondition(
+                    rule_id=rule.id,
+                    condition_type='user_input',
+                    condition_key=cond_key,
+                    operator=cond_operator,
+                    condition_value=cond_value
+                )
+                db.session.add(condition)
+            
+            cond_index += 1
+        
+        db.session.commit()
+        
+        # Log the action
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='update',
+            entity_type='Rule',
+            entity_id=rule.id,
+            details=f'Updated rule: {rule.name}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'Rule "{rule.name}" updated successfully!', 'success')
+        return redirect(url_for('admin.rules'))
+    
+    return render_template('admin/rule_form.html', form=form, rule=rule)
+
+
+@admin_bp.route('/rules/<int:rule_id>/delete', methods=['POST', 'GET'])
+@login_required
+@staff_required
+def rule_delete(rule_id):
+    """Delete rule"""
+    rule = Rule.query.get_or_404(rule_id)
+    rule_name = rule.name
+    
+    # Delete related conditions
+    RuleCondition.query.filter_by(rule_id=rule.id).delete()
+    
+    # Log the action before deleting
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='delete',
+        entity_type='Rule',
+        entity_id=rule.id,
+        details=f'Deleted rule: {rule_name}'
+    )
+    db.session.add(audit_log)
+    
+    db.session.delete(rule)
+    db.session.commit()
+    
+    flash(f'Rule "{rule_name}" deleted successfully!', 'success')
+    return redirect(url_for('admin.rules'))
 
 
 @admin_bp.route('/users')

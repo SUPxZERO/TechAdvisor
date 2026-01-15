@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Edit Rule' if rule else 'Add Rule' }} - TechAdvisor{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{{ url_for('admin.rules') }}" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Rules
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                {% if rule %}Edit Rule{% else %}Add New Rule{% endif %}
+            </h1>
+            <p class="text-gray-600 mt-2">
+                {% if rule %}Update rule definition and conditions{% else %}Create a new inference rule for the expert
+                system{% endif %}
+            </p>
+        </div>
+
+        <!-- Rule Form -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="space-y-6">
+                    <!-- Rule Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Rule Name *
+                        </label>
+                        {{ form.name(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2
+                        focus:ring-indigo-500 focus:border-transparent") }}
+                        {% if form.name.errors %}
+                        <div class="mt-1">
+                            {% for error in form.name.errors %}
+                            <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                            Description
+                        </label>
+                        {{ form.description(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2
+                        focus:ring-indigo-500 focus:border-transparent") }}
+                        {% if form.description.errors %}
+                        <div class="mt-1">
+                            {% for error in form.description.errors %}
+                            <p class="text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Priority and Category Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Priority -->
+                        <div>
+                            <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">
+                                Priority (1-100) *
+                            </label>
+                            {{ form.priority(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2
+                            focus:ring-indigo-500 focus:border-transparent") }}
+                            {% if form.priority.errors %}
+                            <div class="mt-1">
+                                {% for error in form.priority.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500">Higher priority rules are evaluated first</p>
+                        </div>
+
+                        <!-- Target Category -->
+                        <div>
+                            <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                Target Category *
+                            </label>
+                            {{ form.category_id(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2
+                            focus:ring-indigo-500 focus:border-transparent") }}
+                            {% if form.category_id.errors %}
+                            <div class="mt-1">
+                                {% for error in form.category_id.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Conclusion Type and Value Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Conclusion Type -->
+                        <div>
+                            <label for="conclusion_type" class="block text-sm font-medium text-gray-700 mb-2">
+                                Conclusion Type *
+                            </label>
+                            {{ form.conclusion_type(class="w-full px-3 py-2 border border-gray-300 rounded-lg
+                            focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
+                            {% if form.conclusion_type.errors %}
+                            <div class="mt-1">
+                                {% for error in form.conclusion_type.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Conclusion Value -->
+                        <div>
+                            <label for="conclusion_value" class="block text-sm font-medium text-gray-700 mb-2">
+                                Conclusion Value *
+                            </label>
+                            {{ form.conclusion_value(class="w-full px-3 py-2 border border-gray-300 rounded-lg
+                            focus:ring-2 focus:ring-indigo-500 focus:border-transparent") }}
+                            {% if form.conclusion_value.errors %}
+                            <div class="mt-1">
+                                {% for error in form.conclusion_value.errors %}
+                                <p class="text-sm text-red-600">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Active Status -->
+                    <div class="flex items-center">
+                        {{ form.is_active(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded")
+                        }}
+                        <label for="is_active" class="ml-2 block text-sm text-gray-900">
+                            {{ form.is_active.label.text }}
+                        </label>
+                    </div>
+
+                    <!-- Conditions Section -->
+                    {% if rule %}
+                    <div class="border-t pt-6 mt-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Rule Conditions</h3>
+                        <p class="text-sm text-gray-600 mb-4">Define the conditions that must be met for this rule to
+                            fire</p>
+
+                        <div id="conditions-container" class="space-y-4">
+                            {% for condition in rule.conditions %}
+                            <div
+                                class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 condition-row border border-gray-200 rounded-lg p-4">
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Attribute</label>
+                                    <input type="text" name="cond_key_{{ loop.index0 }}"
+                                        value="{{ condition.condition_key }}" placeholder="e.g., budget"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Operator</label>
+                                    <select name="cond_operator_{{ loop.index0 }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                                        <option value="equals" {% if condition.operator=='equals' %}selected{% endif %}>
+                                            Equals</option>
+                                        <option value="not_equals" {% if condition.operator=='not_equals' %}selected{%
+                                            endif %}>Not Equals</option>
+                                        <option value="greater_than" {% if condition.operator=='greater_than'
+                                            %}selected{% endif %}>Greater Than</option>
+                                        <option value="less_than" {% if condition.operator=='less_than' %}selected{%
+                                            endif %}>Less Than</option>
+                                        <option value="greater_equal" {% if condition.operator=='greater_equal'
+                                            %}selected{% endif %}>Greater or Equal</option>
+                                        <option value="less_equal" {% if condition.operator=='less_equal' %}selected{%
+                                            endif %}>Less or Equal</option>
+                                        <option value="contains" {% if condition.operator=='contains' %}selected{% endif
+                                            %}>Contains</option>
+                                    </select>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Value</label>
+                                    <input type="text" name="cond_value_{{ loop.index0 }}"
+                                        value="{{ condition.condition_value }}" placeholder="e.g., 1000"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="button" onclick="removeCondition(this)"
+                                        class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">Remove</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" onclick="addCondition()"
+                            class="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                            + Add Condition
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-4 mt-8 pt-6 border-t">
+                    <a href="{{ url_for('admin.rules') }}"
+                        class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors duration-200">
+                        Cancel
+                    </a>
+                    {{ form.submit(class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium
+                    transition-colors duration-200") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let condCount = {% if rule %}{ { rule.conditions | list | length } } {% else %} 0{% endif %};
+
+    function addCondition() {
+        const container = document.getElementById('conditions-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 condition-row border border-gray-200 rounded-lg p-4';
+        newRow.innerHTML = `
+        <div class="flex-1">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Attribute</label>
+            <input type="text" name="cond_key_${condCount}" placeholder="e.g., budget, usage_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+        </div>
+        <div class="flex-1">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Operator</label>
+            <select name="cond_operator_${condCount}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                <option value="equals">Equals</option>
+                <option value="not_equals">Not Equals</option>
+                <option value="greater_than">Greater Than</option>
+                <option value="less_than">Less Than</option>
+                <option value="greater_equal">Greater or Equal</option>
+                <option value="less_equal">Less or Equal</option>
+                <option value="contains">Contains</option>
+            </select>
+        </div>
+        <div class="flex-1">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Value</label>
+            <input type="text" name="cond_value_${condCount}" placeholder="e.g., gaming, 1000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+        </div>
+        <div class="flex items-end">
+            <button type="button" onclick="removeCondition(this)" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">Remove</button>
+        </div>
+    `;
+        container.appendChild(newRow);
+        condCount++;
+    }
+
+    function removeCondition(button) {
+        button.closest('.condition-row').remove();
+    }
+</script>
+{% endblock %}
