@@ -44,9 +44,9 @@ class User(UserMixin, db.Model):
         """Check if user has specific role"""
         # Check new RBAC system first
         if self.role_obj:
-            return self.role_obj.name == role_name
+            return self.role_obj.name.lower() == role_name.lower()
         # Fallback to legacy
-        return self.role == role_name
+        return str(self.role).lower() == role_name.lower()
         
     def has_permission(self, perm_slug):
         """Check if user has specific permission"""

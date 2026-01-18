@@ -102,8 +102,8 @@ def product_add():
         audit_log = AuditLog(
             user_id=current_user.id,
             action='create',
-            entity_type='Product',
-            entity_id=product.id,
+            table_name='products',
+            record_id=product.id,
             details=f'Created product: {product.name}'
         )
         db.session.add(audit_log)
@@ -159,8 +159,8 @@ def product_edit(product_id):
         audit_log = AuditLog(
             user_id=current_user.id,
             action='update',
-            entity_type='Product',
-            entity_id=product.id,
+            table_name='products',
+            record_id=product.id,
             details=f'Updated product: {product.name}'
         )
         db.session.add(audit_log)
@@ -187,8 +187,8 @@ def product_delete(product_id):
     audit_log = AuditLog(
         user_id=current_user.id,
         action='delete',
-        entity_type='Product',
-        entity_id=product.id,
+        table_name='products',
+        record_id=product.id,
         details=f'Deleted product: {product_name}'
     )
     db.session.add(audit_log)
