@@ -8,6 +8,7 @@ from app.forms.product_forms import ProductForm, BrandForm
 from app.forms.rule_forms import RuleForm
 from app.forms.role_forms import RoleForm
 from app.forms.brand_forms import BrandForm
+from app.forms.user_forms import UserForm
 from app import db
 from functools import wraps
 
@@ -357,10 +358,134 @@ def rule_delete(rule_id):
 def users():
     """User management (admin only)"""
     page = request.args.get('page', 1, type=int)
-    users = User.query.order_by(User.created_at.desc()).paginate(
+    search = request.args.get('search', '')
+    
+    query = User.query
+    
+    if search:
+        query = query.filter(
+            (User.username.ilike(f'%{search}%')) | 
+            (User.email.ilike(f'%{search}%'))
+        )
+    
+    users = query.order_by(User.created_at.desc()).paginate(
         page=page, per_page=20, error_out=False
     )
     return render_template('admin/users.html', users=users)
+
+
+@admin_bp.route('/users/add', methods=['GET', 'POST'])
+@login_required
+@permission_required('user.create')
+def user_add():
+    """Add new user"""
+    form = UserForm()
+    
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+            role_id=form.role_id.data,
+            is_active=form.is_active.data
+        )
+        user.set_password(form.password.data)
+        
+        # Set legacy role based on role_id
+        role = Role.query.get(form.role_id.data)
+        if role:
+            user.role = role.name.lower()
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        # Log the action
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='create',
+            table_name='users',
+            record_id=user.id,
+            details=f'Created user: {user.username}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'User "{user.username}" created successfully!', 'success')
+        return redirect(url_for('admin.users'))
+    
+    return render_template('admin/user_form.html', form=form, user=None)
+
+
+@admin_bp.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+@permission_required('user.edit')
+def user_edit(user_id):
+    """Edit existing user"""
+    user = User.query.get_or_404(user_id)
+    form = UserForm(original_user=user, obj=user)
+    
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        user.role_id = form.role_id.data
+        user.is_active = form.is_active.data
+        
+        # Update password only if provided
+        if form.password.data:
+            user.set_password(form.password.data)
+        
+        # Update legacy role
+        role = Role.query.get(form.role_id.data)
+        if role:
+            user.role = role.name.lower()
+        
+        db.session.commit()
+        
+        # Log the action
+        audit_log = AuditLog(
+            user_id=current_user.id,
+            action='update',
+            table_name='users',
+            record_id=user.id,
+            details=f'Updated user: {user.username}'
+        )
+        db.session.add(audit_log)
+        db.session.commit()
+        
+        flash(f'User "{user.username}" updated successfully!', 'success')
+        return redirect(url_for('admin.users'))
+    
+    return render_template('admin/user_form.html', form=form, user=user)
+
+
+@admin_bp.route('/users/<int:user_id>/delete', methods=['POST'])
+@login_required
+@permission_required('user.delete')
+def user_delete(user_id):
+    """Delete user"""
+    user = User.query.get_or_404(user_id)
+    
+    # Prevent self-deletion
+    if user.id == current_user.id:
+        flash('You cannot delete your own account.', 'error')
+        return redirect(url_for('admin.users'))
+    
+    username = user.username
+    
+    # Log the action before deleting
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='delete',
+        table_name='users',
+        record_id=user.id,
+        details=f'Deleted user: {username}'
+    )
+    db.session.add(audit_log)
+    
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash(f'User "{username}" deleted successfully!', 'success')
+    return redirect(url_for('admin.users'))
 
 
 # Role Management Routes
@@ -592,3 +717,102 @@ def brand_delete(brand_id):
     
     flash(f'Brand "{brand_name}" deleted successfully!', 'success')
     return redirect(url_for('admin.brands'))
+
+
+# ============================================================================
+# STATUS MANAGEMENT ROUTES - Enable/Disable Products, Users, and Rules
+# ============================================================================
+
+@admin_bp.route('/products/<int:product_id>/toggle-status', methods=['POST', 'GET'])
+@login_required
+@permission_required('product.edit')
+def product_toggle_status(product_id):
+    """Toggle product active/inactive status"""
+    product = Product.query.get_or_404(product_id)
+    
+    # Toggle the status
+    product.is_active = not product.is_active
+    db.session.commit()
+    
+    # Log the action
+    status_text = 'activated' if product.is_active else 'deactivated'
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='status_update',
+        table_name='products',
+        record_id=product.id,
+        details=f'{status_text.capitalize()} product: {product.name}'
+    )
+    db.session.add(audit_log)
+    db.session.commit()
+    
+    status_text = 'activated' if product.is_active else 'deactivated'
+    flash(f'Product "{product.name}" has been {status_text}!', 'success')
+    
+    # Return to referrer or products page
+    return redirect(request.referrer or url_for('admin.products'))
+
+
+@admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST', 'GET'])
+@login_required
+@permission_required('user.edit')
+def user_toggle_status(user_id):
+    """Toggle user active/inactive status"""
+    user = User.query.get_or_404(user_id)
+    
+    # Prevent deactivating current user
+    if user.id == current_user.id:
+        flash('You cannot deactivate your own account.', 'error')
+        return redirect(request.referrer or url_for('admin.users'))
+    
+    # Toggle the status
+    user.is_active = not user.is_active
+    db.session.commit()
+    
+    # Log the action
+    status_text = 'activated' if user.is_active else 'deactivated'
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='status_update',
+        table_name='users',
+        record_id=user.id,
+        details=f'{status_text.capitalize()} user: {user.username}'
+    )
+    db.session.add(audit_log)
+    db.session.commit()
+    
+    status_text = 'activated' if user.is_active else 'deactivated'
+    flash(f'User "{user.username}" has been {status_text}!', 'success')
+    
+    # Return to referrer or users page
+    return redirect(request.referrer or url_for('admin.users'))
+
+
+@admin_bp.route('/rules/<int:rule_id>/toggle-status', methods=['POST', 'GET'])
+@login_required
+@permission_required('rule.manage')
+def rule_toggle_status(rule_id):
+    """Toggle rule active/inactive status"""
+    rule = Rule.query.get_or_404(rule_id)
+    
+    # Toggle the status
+    rule.is_active = not rule.is_active
+    db.session.commit()
+    
+    # Log the action
+    status_text = 'activated' if rule.is_active else 'deactivated'
+    audit_log = AuditLog(
+        user_id=current_user.id,
+        action='status_update',
+        table_name='rules',
+        record_id=rule.id,
+        details=f'{status_text.capitalize()} rule: {rule.name}'
+    )
+    db.session.add(audit_log)
+    db.session.commit()
+    
+    status_text = 'activated' if rule.is_active else 'deactivated'
+    flash(f'Rule "{rule.name}" has been {status_text}!', 'success')
+    
+    # Return to referrer or rules page
+    return redirect(request.referrer or url_for('admin.rules'))

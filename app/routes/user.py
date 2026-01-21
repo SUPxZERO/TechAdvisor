@@ -79,8 +79,8 @@ def compare():
         flash('You can compare up to 4 products at a time.', 'warning')
         ids = ids[:4]
     
-    # Fetch products with their specifications
-    products = Product.query.filter(Product.id.in_(ids)).all()
+    # Fetch products with their specifications (only active products)
+    products = Product.query.filter(Product.id.in_(ids), Product.is_active == True).all()
     
     if not products:
         flash('No products found.', 'error')
