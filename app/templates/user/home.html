@@ -1,255 +1,214 @@
 {% extends 'base.html' %}
 
-{% block title %}TechAdvisor - Find Your Perfect Tech Product{% endblock %}
+{% block title %}TechAdvisor - Curated Tech for Humans{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<div class="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 overflow-hidden">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 opacity-10">
-        <div class="absolute inset-0"
-            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
+<div class="relative overflow-hidden pt-20 pb-24 lg:pt-32 lg:pb-40">
+    <!-- Subtle Background Elements -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
+        <div
+            class="absolute top-20 left-10 w-96 h-96 bg-brand-200/50 rounded-full blur-3xl mix-blend-multiply opacity-30 animate-pulse">
+        </div>
+        <div
+            class="absolute top-40 right-10 w-96 h-96 bg-brand-300/30 rounded-full blur-3xl mix-blend-multiply opacity-30">
         </div>
     </div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-        <div class="text-center">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight">
-                Find Your Perfect
-                <span class="block text-yellow-300">Tech Product</span>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+        <div class="reveal">
+            <span
+                class="inline-block py-1 px-3 rounded-full bg-brand-100 border border-brand-200 text-brand-600 text-xs font-semibold tracking-wide uppercase mb-6">
+                Expert System AI v2.0
+            </span>
+            <h1 class="text-5xl sm:text-7xl font-display font-bold text-brand-900 tracking-tight mb-8 leading-tight">
+                Tech recommendations, <br />
+                <span
+                    class="text-transparent bg-clip-text bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 italic">curated
+                    for you.</span>
             </h1>
-            <p class="mt-6 max-w-3xl mx-auto text-xl sm:text-2xl text-indigo-100 leading-relaxed">
-                AI-powered recommendations powered by expert system logic. Answer a few questions and discover products
-                perfectly matched to your needs.
+            <p class="mt-6 max-w-2xl mx-auto text-xl text-brand-600 leading-relaxed font-light">
+                Stop scrolling through endless reviews. Our expert system analyzes your specific needs to find the one
+                product that fits your life perfectly.
             </p>
-            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+
+            <div class="mt-10 flex flex-col sm:flex-row gap-5 justify-center items-center">
                 <a href="{{ url_for('user.recommend') }}"
-                    class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="group relative inline-flex items-center px-8 py-4 text-base font-semibold text-white bg-brand-900 rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.02] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)]">
+                    <span class="relative z-10">Start Recommendation</span>
+                    <svg class="w-5 h-5 ml-2 relative z-10 group-hover:translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                     </svg>
-                    Get Started Now
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-brand-800 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
                 </a>
                 <a href="#how-it-works"
-                    class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg text-white bg-indigo-700 bg-opacity-50 hover:bg-opacity-70 backdrop-blur-sm border-2 border-white border-opacity-30 transition-all duration-200">
-                    Learn How It Works
-                    <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    class="inline-flex items-center px-8 py-4 text-base font-medium text-brand-600 hover:text-brand-900 transition-colors">
+                    How it works
                 </a>
             </div>
         </div>
-    </div>
-
-    <!-- Wave Divider -->
-    <div class="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" class="w-full h-auto">
-            <path fill="#f9fafb"
-                d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z">
-            </path>
-        </svg>
     </div>
 </div>
 
-<!-- How It Works Section -->
-<section id="how-it-works" class="py-20 bg-gray-50">
+<!-- Bento Grid: How It Works -->
+<section id="how-it-works" class="py-24 bg-white relative border-t border-brand-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                How It Works
+        <div class="mb-16 md:mb-24">
+            <h2 class="text-3xl md:text-4xl font-display font-bold text-brand-900 tracking-tight mb-4">
+                Simplicity by design.
             </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Get personalized product recommendations in three simple steps
+            <p class="text-lg text-brand-500 max-w-xl">
+                Complex reasoning happens under the hood. You just answer plain English questions.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Step 1 -->
-            <div class="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div
-                    class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                    1
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+            <!-- Card 1: Large Span -->
+            <div
+                class="md:col-span-2 relative bg-brand-50 rounded-3xl p-10 overflow-hidden group hover:border-brand-200 border border-transparent transition-all duration-300">
+                <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg class="w-64 h-64 text-brand-900" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
                 </div>
-                <div class="mt-8 text-center">
-                    <div class="mx-auto w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                            </path>
-                        </svg>
+                <div class="relative z-10 h-full flex flex-col justify-between">
+                    <div
+                        class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-brand-900 font-bold text-lg mb-4">
+                        1</div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-900 mb-2">Defining your needs</h3>
+                        <p class="text-brand-600">No tech jargon. We ask about your budget, usage habits, and priorities
+                            in a simple conversational format.</p>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Answer Questions</h3>
-                    <p class="text-gray-600">Tell us about your needs, budget, and preferences through our simple
-                        questionnaire</p>
                 </div>
             </div>
 
-            <!-- Step 2 -->
-            <div class="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div
-                    class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                    2
-                </div>
-                <div class="mt-8 text-center">
-                    <div class="mx-auto w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
-                            </path>
-                        </svg>
+            <!-- Card 2: Tall -->
+            <div
+                class="md:row-span-2 relative bg-brand-900 rounded-3xl p-10 overflow-hidden text-white group shadow-2xl shadow-brand-900/10">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/40"></div>
+                <div class="relative z-10 h-full flex flex-col justify-between">
+                    <div
+                        class="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20 text-white font-bold text-lg mb-4">
+                        2</div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-2">AI Reasoning</h3>
+                        <p class="text-brand-300 mb-6">Our rigid expert system logic filters through 50+ data points
+                            instantly to ensure compatibility.</p>
+                        <!-- Abstract Visual -->
+                        <div class="space-y-2 opacity-50">
+                            <div class="h-2 w-full bg-white/20 rounded-full"></div>
+                            <div class="h-2 w-3/4 bg-white/20 rounded-full"></div>
+                            <div class="h-2 w-1/2 bg-white/20 rounded-full"></div>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">AI Matching</h3>
-                    <p class="text-gray-600">Our expert system analyzes your requirements and matches you with the best
-                        products</p>
                 </div>
             </div>
 
-            <!-- Step 3 -->
-            <div class="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div
-                    class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-pink-500 to-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                    3
+            <!-- Card 3 -->
+            <div
+                class="relative bg-white border border-brand-200 rounded-3xl p-10 overflow-hidden group hover:shadow-lg transition-all duration-300">
+                <div class="relative z-10 h-full flex flex-col justify-between">
+                    <div
+                        class="w-12 h-12 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-900 font-bold text-lg mb-4">
+                        3</div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-900 mb-2">The Match</h3>
+                        <p class="text-brand-600">Get a definitive recommendation, not a list of 20 "maybe" options.</p>
+                    </div>
                 </div>
-                <div class="mt-8 text-center">
-                    <div class="mx-auto w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-10 h-10 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            </div>
+
+            <!-- Card 4 -->
+            <div
+                class="relative bg-brand-50 rounded-3xl p-10 overflow-hidden group hover:bg-brand-100 transition-colors duration-300">
+                <div class="relative z-10 h-full flex flex-col justify-between">
+                    <div
+                        class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-brand-900 font-bold text-lg mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                            </path>
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Compare & Choose</h3>
-                    <p class="text-gray-600">View detailed comparisons and make an informed decision on your perfect
-                        product</p>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-900 mb-2">Verify</h3>
+                        <p class="text-brand-600">Compare specs side-by-side to understand why it won.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
-<section class="py-20 bg-white">
+<!-- Features / Value Prop -->
+<section class="py-32 bg-brand-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Why Choose TechAdvisor?
-            </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Powered by expert system logic to give you the most accurate recommendations
-            </p>
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16">
+            <div class="max-w-2xl">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-brand-900 tracking-tight mb-6">
+                    Why trust an algorithm?
+                </h2>
+                <p class="text-lg text-brand-600">
+                    Unlike human sales reps, TechAdvisor is unbiased. It cares about specs, compatibility, and rules—not
+                    commissions.
+                </p>
+            </div>
+            <a href="{{ url_for('user.recommend') }}"
+                class="hidden md:flex items-center text-brand-900 font-semibold hover:text-brand-accent transition-colors">
+                View all logic rules <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3">
+                    </path>
+                </svg>
+            </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Feature 1 -->
-            <div class="text-center group">
-                <div
-                    class="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 transform group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="group">
+                <div class="w-full h-px bg-brand-200 mb-8 group-hover:bg-brand-900 transition-colors duration-500">
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Smart Recommendations</h3>
-                <p class="text-gray-600 text-sm">AI-powered matching based on your specific needs</p>
+                <h3 class="text-xl font-bold text-brand-900 mb-3">Zero Hallucinations</h3>
+                <p class="text-brand-500 leading-relaxed">
+                    We use a deterministic expert system, not a generative LLM that makes things up. If we recommend it,
+                    it exists and fits your criteria.
+                </p>
             </div>
-
-            <!-- Feature 2 -->
-            <div class="text-center group">
-                <div
-                    class="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 transform group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                        </path>
-                    </svg>
+            <div class="group">
+                <div class="w-full h-px bg-brand-200 mb-8 group-hover:bg-brand-900 transition-colors duration-500">
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Expert System Logic</h3>
-                <p class="text-gray-600 text-sm">Powered by advanced rule-based reasoning</p>
+                <h3 class="text-xl font-bold text-brand-900 mb-3">Updated Catalog</h3>
+                <p class="text-brand-500 leading-relaxed">
+                    Our database tracks 50+ current-gen devices across major brands, constantly updated with real market
+                    pricing.
+                </p>
             </div>
-
-            <!-- Feature 3 -->
-            <div class="text-center group">
-                <div
-                    class="mx-auto w-16 h-16 bg-gradient-to-br from-pink-500 to-red-600 rounded-xl flex items-center justify-center mb-4 transform group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                        </path>
-                    </svg>
+            <div class="group">
+                <div class="w-full h-px bg-brand-200 mb-8 group-hover:bg-brand-900 transition-colors duration-500">
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Side-by-Side Comparison</h3>
-                <p class="text-gray-600 text-sm">Compare up to 4 products at once</p>
-            </div>
-
-            <!-- Feature 4 -->
-            <div class="text-center group">
-                <div
-                    class="mx-auto w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center mb-4 transform group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">50+ Products</h3>
-                <p class="text-gray-600 text-sm">Curated selection of top tech products</p>
+                <h3 class="text-xl font-bold text-brand-900 mb-3">Privacy First</h3>
+                <p class="text-brand-500 leading-relaxed">
+                    No account required for recommendations. We don't track your shopping habits across the web.
+                </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="relative py-20 bg-gradient-to-r from-indigo-600 to-purple-600 overflow-hidden">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 opacity-10">
-        <div class="absolute inset-0"
-            style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;">
-        </div>
-    </div>
-
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Find Your Perfect Product?
+<!-- Minimal CTA -->
+<section class="py-24 bg-white border-t border-brand-100">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-4xl md:text-5xl font-display font-bold text-brand-900 tracking-tight mb-8">
+            Ready to upgrade?
         </h2>
-        <p class="text-xl text-indigo-100 mb-10">
-            Join thousands of satisfied users who found their ideal tech products with TechAdvisor
-        </p>
-        <a href="{{ url_for('user.recommend') }}"
-            class="inline-flex items-center px-10 py-5 text-lg font-bold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
-                </path>
-            </svg>
-            Start Your Recommendation
-            <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
-                </path>
-            </svg>
-        </a>
-    </div>
-</section>
-
-<!-- Stats Section -->
-<!-- <section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-                <div class="text-4xl font-bold text-indigo-600 mb-2">54+</div>
-                <div class="text-gray-600">Products</div>
-            </div>
-            <div>
-                <div class="text-4xl font-bold text-purple-600 mb-2">10+</div>
-                <div class="text-gray-600">Brands</div>
-            </div>
-            <div>
-                <div class="text-4xl font-bold text-pink-600 mb-2">5</div>
-                <div class="text-gray-600">AI Rules</div>
-            </div>
-            <div>
-                <div class="text-4xl font-bold text-red-600 mb-2">100%</div>
-                <div class="text-gray-600">Match Accuracy</div>
-            </div>
+        <div class="flex justify-center">
+            <a href="{{ url_for('user.recommend') }}"
+                class="inline-flex items-center px-10 py-5 text-lg font-semibold text-white bg-brand-900 rounded-full hover:bg-black transition-all shadow-xl shadow-brand-900/20 hover:scale-[1.02]">
+                Start Recommendation
+            </a>
         </div>
     </div>
-</section> -->
+</section>
 {% endblock %}

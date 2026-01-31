@@ -20,9 +20,9 @@ class RecommendationForm(FlaskForm):
     usage_type = SelectField('Primary Usage',
                             choices=[
                                 ('gaming', 'Gaming'),
-                                ('work', 'Professional/Business'),
-                                ('study', 'Education/Study'),
-                                ('general', 'General/Everyday Use'),
+                                ('work', 'Business'),
+                                ('study', 'Education'),
+                                ('general', 'General'),
                                 ('creative', 'Content Creation')
                             ],
                             validators=[DataRequired()])

@@ -3,42 +3,68 @@
 {% block title %}Login - TechAdvisor{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <!-- Header -->
-        <div class="text-center">
-            <div class="flex justify-center">
-                <svg class="h-16 w-16 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                    </path>
-                </svg>
-            </div>
-            <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
-                Admin Login
+<div
+    class="min-h-screen relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden bg-brand-50">
+    <!-- Background Decor -->
+    <div class="absolute inset-0 z-0 opacity-40">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-200 rounded-full blur-[120px] mix-blend-multiply opacity-50 animate-pulse">
+        </div>
+        <div
+            class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-brand-300 rounded-full blur-[120px] mix-blend-multiply opacity-50">
+        </div>
+    </div>
+
+    <div class="max-w-[420px] w-full space-y-8 relative z-10 reveal">
+        <!-- Brand Header -->
+        <div class="text-center mb-8">
+            <a href="{{ url_for('user.home') }}" class="inline-block hover:scale-105 transition-transform duration-300">
+                <div
+                    class="h-16 w-16 bg-brand-900 rounded-2xl flex items-center justify-center text-white mx-auto shadow-xl rotate-3 hover:rotate-6 transition-transform">
+                    <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                        </path>
+                    </svg>
+                </div>
+            </a>
+            <h2 class="mt-6 text-3xl font-display font-bold text-brand-900 tracking-tight">
+                Welcome Back
             </h2>
-            <p class="mt-2 text-sm text-gray-600">
-                Sign in to access the admin dashboard
+            <p class="mt-2 text-brand-500 font-medium">
+                Sign in to manage your expert system
             </p>
         </div>
 
-        <!-- Login Form -->
-        <div class="bg-white py-8 px-6 shadow-lg rounded-lg">
+        <!-- Login Card -->
+        <div
+            class="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/50 relative overflow-hidden group">
+            <!-- Subtle Card Decor -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-900 via-brand-600 to-brand-900">
+            </div>
+
             <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6">
                 {{ form.hidden_tag() }}
 
                 <!-- Username Field -->
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="username" class="block text-xs font-bold text-brand-900 uppercase tracking-widest mb-2">
                         Username
                     </label>
-                    {{ form.username(class="appearance-none relative block w-full px-3 py-2 border border-gray-300
-                    placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500
-                    focus:border-indigo-500 focus:z-10 sm:text-sm") }}
+                    {{ form.username(class="appearance-none block w-full px-4 py-3 border border-brand-200 rounded-xl
+                    placeholder-brand-300 text-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-900
+                    focus:border-transparent transition-all bg-brand-50/50 focus:bg-white") }}
                     {% if form.username.errors %}
-                    <div class="mt-1">
+                    <div class="mt-2">
                         {% for error in form.username.errors %}
-                        <p class="text-sm text-red-600">{{ error }}</p>
+                        <p class="text-sm text-red-600 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                            {{ error }}
+                        </p>
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -46,16 +72,23 @@
 
                 <!-- Password Field -->
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="password" class="block text-xs font-bold text-brand-900 uppercase tracking-widest mb-2">
                         Password
                     </label>
-                    {{ form.password(class="appearance-none relative block w-full px-3 py-2 border border-gray-300
-                    placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500
-                    focus:border-indigo-500 focus:z-10 sm:text-sm") }}
+                    {{ form.password(class="appearance-none block w-full px-4 py-3 border border-brand-200 rounded-xl
+                    placeholder-brand-300 text-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-900
+                    focus:border-transparent transition-all bg-brand-50/50 focus:bg-white") }}
                     {% if form.password.errors %}
-                    <div class="mt-1">
+                    <div class="mt-2">
                         {% for error in form.password.errors %}
-                        <p class="text-sm text-red-600">{{ error }}</p>
+                        <p class="text-sm text-red-600 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                            {{ error }}
+                        </p>
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -64,44 +97,48 @@
                 <!-- Remember Me -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        {{ form.remember_me(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300
-                        rounded") }}
-                        <label for="remember_me" class="ml-2 block text-sm text-gray-900">
-                            Remember me
+                        {{ form.remember_me(class="h-4 w-4 text-brand-900 focus:ring-brand-900 border-brand-300 rounded
+                        cursor-pointer") }}
+                        <label for="remember_me" class="ml-2 block text-sm text-brand-600 cursor-pointer select-none">
+                            Keep me signed in
                         </label>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
-                <div>
-                    {{ form.submit(class="group relative w-full flex justify-center py-2 px-4 border border-transparent
-                    text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none
-                    focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200") }}
-                </div>
+                <button type="submit"
+                    class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-brand-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-900 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
+                    Sign in to Dashboard
+                </button>
             </form>
 
-            <!-- Default Credentials Info -->
-             <div class="flex justify-center gap-4">
-                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg gap-4">
-                    <p class="text-xs text-blue-800 font-medium mb-1">Default Admin Credentials:</p>
-                    <p class="text-xs text-blue-700">Username: <code class="bg-blue-100 px-1 py-0.5 rounded">admin</code>
-                    </p>
-                    <p class="text-xs text-blue-700">Password: <code class="bg-blue-100 px-1 py-0.5 rounded">admin123</code>
-                    </p>
-                </div>
-                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg gap-4">
-                    <p class="text-xs text-blue-800 font-medium mb-1">Default Staff Credentials:</p>
-                    <p class="text-xs text-blue-700">Username: <code class="bg-blue-100 px-1 py-0.5 rounded">staff</code>
-                    </p>
-                    <p class="text-xs text-blue-700">Password: <code class="bg-blue-100 px-1 py-0.5 rounded">staff123</code>
-                    </p>
+            <!-- Default Credentials Hint -->
+            <div class="mt-8 pt-6 border-t border-dashed border-brand-200">
+                <p class="text-xs font-bold text-brand-400 uppercase tracking-widest text-center mb-4">Demo Credentials
+                </p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div
+                        class="bg-brand-50 p-3 rounded-lg text-center border border-brand-100 hover:border-brand-300 transition-colors cursor-help group/hint">
+                        <div class="text-xs text-brand-500 font-semibold mb-1">Admin</div>
+                        <div
+                            class="text-xs font-mono text-brand-900 bg-white px-2 py-1 rounded border border-brand-100 mx-auto w-max group-hover/hint:scale-105 transition-transform">
+                            admin / admin123</div>
+                    </div>
+                    <div
+                        class="bg-brand-50 p-3 rounded-lg text-center border border-brand-100 hover:border-brand-300 transition-colors cursor-help group/hint">
+                        <div class="text-xs text-brand-500 font-semibold mb-1">Staff</div>
+                        <div
+                            class="text-xs font-mono text-brand-900 bg-white px-2 py-1 rounded border border-brand-100 mx-auto w-max group-hover/hint:scale-105 transition-transform">
+                            staff / staff123</div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-        <!-- Back to Home -->
         <div class="text-center">
-            <a href="{{ url_for('user.home') }}" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
-                ← Back to Home
+            <a href="{{ url_for('user.home') }}"
+                class="text-sm font-bold text-brand-400 hover:text-brand-900 transition-colors inline-flex items-center gap-1 group/back">
+                <span class="group-hover/back:-translate-x-1 transition-transform">←</span> Return to Home
             </a>
         </div>
     </div>

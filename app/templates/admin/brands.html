@@ -3,17 +3,17 @@
 {% block title %}Brands - TechAdvisor{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-brand-50 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 reveal">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Brand Management</h1>
-                <p class="text-gray-600 mt-2">Manage product manufacturers and logos</p>
+                <span class="text-xs font-bold text-brand-400 uppercase tracking-widest">Catalog</span>
+                <h1 class="text-3xl font-display font-bold text-brand-900 mt-1">Brands</h1>
             </div>
             {% if current_user.has_permission('brand.manage') %}
             <a href="{{ url_for('admin.brand_add') }}"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors duration-200 shadow-md">
+                class="bg-brand-900 hover:bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                 <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -24,31 +24,38 @@
         </div>
 
         <!-- Brands List -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal" style="animation-delay: 100ms;">
             {% for brand in brands %}
-            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-                <div class="flex items-center justify-between mb-4">
+            <div
+                class="bg-white rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-brand-100 p-6 hover:border-brand-300 transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center space-x-4">
                         {% if brand.logo_url %}
-                        <img src="{{ brand.logo_url }}" alt="{{ brand.name }}"
-                            class="h-12 w-12 object-contain rounded-full bg-gray-50 border border-gray-100">
+                        <div
+                            class="h-16 w-16 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center p-2">
+                            <img src="{{ brand.logo_url }}" alt="{{ brand.name }}"
+                                class="max-h-full max-w-full object-contain mix-blend-multiply">
+                        </div>
                         {% else %}
                         <div
-                            class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xl">
+                            class="h-16 w-16 rounded-2xl bg-brand-900 flex items-center justify-center text-white font-display font-bold text-2xl shadow-lg">
                             {{ brand.name[:1] }}
                         </div>
                         {% endif %}
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900">{{ brand.name }}</h3>
-                            <p class="text-sm text-gray-500">{{ brand.products.count() }} Products</p>
+                            <h3 class="text-xl font-display font-bold text-brand-900">{{ brand.name }}</h3>
+                            <a href="{{ url_for('admin.products', brand=brand.id) }}"
+                                class="text-xs font-bold text-brand-500 uppercase tracking-widest hover:text-brand-900 transition-colors">
+                                {{ brand.products.count() }} Products →
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 {% if current_user.has_permission('brand.manage') %}
-                <div class="flex justify-end space-x-2 pt-4 border-t border-gray-100">
+                <div class="flex justify-end space-x-3 pt-6 border-t border-brand-50">
                     <a href="{{ url_for('admin.brand_edit', brand_id=brand.id) }}"
-                        class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors duration-150"
+                        class="p-2 text-brand-400 hover:text-brand-900 hover:bg-brand-50 rounded-xl transition-all duration-200"
                         title="Edit Brand">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -61,7 +68,7 @@
                         onsubmit="return confirm('Are you sure you want to delete this brand?');" class="inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit"
-                            class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors duration-150"
+                            class="p-2 text-brand-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200"
                             title="Delete Brand">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -74,6 +81,20 @@
                 {% endif %}
             </div>
             {% endfor %}
+
+            {% if not brands %}
+            <div class="col-span-full py-12 text-center">
+                <div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="h-8 w-8 text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-brand-900 mb-1">No brands found</h3>
+                <p class="text-brand-500 text-sm">Add a brand to start grouping products.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

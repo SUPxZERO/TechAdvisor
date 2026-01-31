@@ -3,75 +3,93 @@
 {% block title %}Compare Products - TechAdvisor{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12">
+<div class="min-h-screen bg-brand-50 py-12 pt-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                Product Comparison
+        <div class="text-center mb-12 reveal">
+            <h1 class="text-3xl md:text-5xl font-display font-bold text-brand-900 mb-4 tracking-tight">
+                Head-to-Head
             </h1>
-            <p class="text-lg text-gray-600">
-                Comparing {{ products|length }} products side-by-side
+            <p class="text-xl text-brand-500 font-light">
+                Comparing {{ products|length }} premium devices side-by-side
             </p>
         </div>
 
-        <!-- Comparison Table -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+        <!-- Comparison Table Container -->
+        <div class="bg-white rounded-3xl border border-brand-100 shadow-[0_4px_30px_rgba(0,0,0,0.03)] overflow-hidden reveal"
+            style="animation-delay: 100ms;">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="min-w-full divide-y divide-brand-100">
                     <!-- Product Images & Names -->
-                    <thead class="bg-gradient-to-r from-indigo-600 to-purple-600">
+                    <thead>
                         <tr>
                             <th scope="col"
-                                class="px-6 py-4 text-left text-sm font-semibold text-white sticky left-0 bg-indigo-600 z-10">
+                                class="px-8 py-8 text-left text-sm font-bold text-brand-400 uppercase tracking-widest sticky left-0 bg-white z-20 border-r border-brand-50 w-48 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
                                 Feature
                             </th>
                             {% for product in products %}
-                            <th scope="col" class="px-6 py-4 text-center min-w-[250px]">
-                                <div class="flex flex-col items-center space-y-3">
+                            <th scope="col" class="px-8 py-8 text-center min-w-[280px] bg-white">
+                                <div class="flex flex-col items-center group relative">
+
                                     <!-- Product Image -->
-                                    <div class="w-32 h-32 bg-white rounded-lg overflow-hidden shadow-lg">
+                                    <div
+                                        class="w-40 h-40 mb-6 bg-brand-50 rounded-2xl flex items-center justify-center p-4 group-hover:bg-brand-100 transition-colors duration-300">
+                                        {% if product.image_url %}
                                         <img src="{{ product.image_url }}" alt="{{ product.name }}"
-                                            class="w-full h-full object-cover">
+                                            class="max-w-full max-h-full object-contain mix-blend-multiply filter contrast-105">
+                                        {% else %}
+                                        <svg class="w-16 h-16 text-brand-300" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                        {% endif %}
                                     </div>
+
                                     <!-- Product Name -->
-                                    <div class="text-white">
-                                        <div class="font-bold text-base">{{ product.name }}</div>
-                                        <div class="text-sm text-indigo-100">{{ product.brand }}</div>
-                                    </div>
+                                    <h3 class="font-display font-bold text-lg text-brand-900 mb-1 leading-tight">{{
+                                        product.name }}</h3>
+                                    <p class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-4">{{
+                                        product.brand.name }}</p>
+
+                                    <a href="{{ url_for('user.product_detail', product_id=product.id) }}"
+                                        class="text-xs font-bold text-brand-900 border-b border-brand-900 hover:text-black hover:border-black transition-colors">
+                                        View Details
+                                    </a>
                                 </div>
                             </th>
                             {% endfor %}
                         </tr>
                     </thead>
 
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="divide-y divide-brand-50">
                         <!-- Price Row -->
-                        <tr class="bg-yellow-50 hover:bg-yellow-100 transition">
+                        <tr class="bg-brand-50/50">
                             <td
-                                class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 sticky left-0 bg-yellow-50 z-10">
-                                💰 Price
+                                class="px-8 py-6 text-sm font-bold text-brand-900 sticky left-0 bg-brand-50/80 backdrop-blur-sm z-10 border-r border-brand-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+                                Price
                             </td>
                             {% for product in products %}
-                            <td class="px-6 py-4 text-center">
-                                <span class="text-2xl font-bold text-indigo-600">
-                                    ${{ "%.2f"|format(product.price) }}
+                            <td class="px-8 py-6 text-center">
+                                <span class="text-2xl font-display font-bold text-brand-900">
+                                    ${{ "%.0f"|format(product.price) }}
                                 </span>
                             </td>
                             {% endfor %}
                         </tr>
 
                         <!-- Category Row -->
-                        <tr class="hover:bg-gray-50 transition">
+                        <tr>
                             <td
-                                class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 sticky left-0 bg-white z-10">
-                                📱 Category
+                                class="px-8 py-6 text-sm font-bold text-brand-900 sticky left-0 bg-white z-10 border-r border-brand-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+                                Category
                             </td>
                             {% for product in products %}
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-8 py-6 text-center">
                                 <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
-                                    {{ product.category }}
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold font-display uppercase tracking-wider border border-brand-200 text-brand-500">
+                                    {{ product.category.name }}
                                 </span>
                             </td>
                             {% endfor %}
@@ -79,29 +97,35 @@
 
                         <!-- Specifications Rows -->
                         {% for spec_key in spec_keys %}
-                        <tr class="hover:bg-gray-50 transition">
+                        {% set values = [] %}
+                        {% for product in products %}
+                        {% set value = product.specifications.get(spec_key, 'N/A') %}
+                        {% set _ = values.append(value) %}
+                        {% endfor %}
+
+                        {% set unique_values = values|unique|list %}
+                        {% set is_diff = unique_values|length > 1 %}
+
+                        <tr class="hover:bg-brand-50/30 transition-colors">
                             <td
-                                class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 sticky left-0 bg-white z-10">
-                                {{ spec_key }}
+                                class="px-8 py-5 text-sm font-medium text-brand-500 sticky left-0 bg-white z-10 border-r border-brand-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)] flex items-center justify-between group">
+                                <span>{{ spec_key }}</span>
+                                {% if is_diff and products|length > 1 %}
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-accent ml-2"
+                                    title="Differences found"></span>
+                                {% endif %}
                             </td>
-                            {% set values = [] %}
-                            {% for product in products %}
-                            {% set value = product.specifications.get(spec_key, 'N/A') %}
-                            {% set _ = values.append(value) %}
-                            {% endfor %}
 
                             {% for product in products %}
-                            <td class="px-6 py-4 text-center text-sm">
+                            <td class="px-8 py-5 text-center text-sm">
                                 {% set value = product.specifications.get(spec_key, 'N/A') %}
-                                {% set unique_values = values|unique|list %}
+
                                 {% if value == 'N/A' %}
-                                <span class="text-gray-400 italic">{{ value }}</span>
-                                {% elif unique_values|length > 1 %}
-                                <span class="font-semibold text-gray-900 bg-yellow-100 px-2 py-1 rounded">
-                                    {{ value }}
-                                </span>
+                                <span class="text-brand-300 italic text-xs">Not specified</span>
+                                {% elif is_diff and products|length > 1 %}
+                                <span class="font-bold text-brand-900">{{ value }}</span>
                                 {% else %}
-                                <span class="text-gray-700">{{ value }}</span>
+                                <span class="text-brand-600">{{ value }}</span>
                                 {% endif %}
                             </td>
                             {% endfor %}
@@ -109,12 +133,13 @@
                         {% endfor %}
 
                         <!-- Description Row -->
-                        <tr class="bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-semibold text-gray-900 sticky left-0 bg-gray-50 z-10">
-                                📝 Description
+                        <tr class="bg-brand-50/50">
+                            <td
+                                class="px-8 py-6 text-sm font-bold text-brand-900 sticky left-0 bg-brand-50/80 backdrop-blur-sm z-10 border-r border-brand-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)] align-top">
+                                Summary
                             </td>
                             {% for product in products %}
-                            <td class="px-6 py-4 text-sm text-gray-600">
+                            <td class="px-8 py-6 text-sm text-brand-500 leading-relaxed min-w-[300px] text-justify">
                                 {{ product.description or 'No description available' }}
                             </td>
                             {% endfor %}
@@ -125,28 +150,38 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button onclick="window.history.back()"
-                class="px-8 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                ← Back to Results
+                class="px-8 py-4 rounded-xl border border-brand-200 text-brand-900 font-bold hover:bg-brand-50 transition-colors w-full sm:w-auto">
+                Back to Results
             </button>
             <a href="{{ url_for('user.recommend') }}"
-                class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-center">
-                🔍 New Search
+                class="px-8 py-4 bg-brand-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 w-full sm:w-auto text-center">
+                Start New Analysis
             </a>
         </div>
 
-        <!-- Legend -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 class="text-sm font-semibold text-blue-900 mb-2">💡 How to read this comparison:</h3>
-            <ul class="text-sm text-blue-800 space-y-1">
-                <li>• <span class="bg-yellow-100 px-2 py-0.5 rounded font-semibold">Highlighted values</span> indicate
-                    differences between products</li>
-                <li>• <span class="text-gray-400 italic">N/A</span> means the specification is not available for that
-                    product</li>
-                <li>• Scroll horizontally to see all products if viewing on a smaller screen</li>
-            </ul>
-        </div>
     </div>
 </div>
+
+<style>
+    /* Custom scrollbar for table */
+    .custom-scrollbar::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f4f4f5;
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #d4d4d8;
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #a1a1aa;
+    }
+</style>
 {% endblock %}
