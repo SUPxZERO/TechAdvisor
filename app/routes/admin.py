@@ -816,3 +816,51 @@ def rule_toggle_status(rule_id):
     
     # Return to referrer or rules page
     return redirect(request.referrer or url_for('admin.rules'))
+
+
+# Audit Log Routes
+
+@admin_bp.route('/audit-log')
+@login_required
+@admin_required
+def audit_log():
+    """View system audit log (admin only)"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        search = request.args.get('search', '')
+        action_filter = request.args.get('action', '')
+        table_filter = request.args.get('table', '')
+        
+        # Start with base query
+        query = AuditLog.query
+        
+        # Apply search filter on user or details
+        if search:
+            query = query.filter(
+                AuditLog.details.ilike(f'%{search}%')
+            )
+        
+        # Apply action filter
+        if action_filter:
+            query = query.filter(AuditLog.action == action_filter)
+        
+        # Apply table filter
+        if table_filter:
+            query = query.filter(AuditLog.table_name == table_filter)
+        
+        # Paginate results
+        audit_logs = query.order_by(AuditLog.created_at.desc()).paginate(
+            page=page, per_page=50, error_out=False
+        )
+        
+        # Get unique values for filters
+        available_actions = db.session.query(AuditLog.action).distinct().all()
+        available_tables = db.session.query(AuditLog.table_name).distinct().all()
+        
+        return render_template('admin/audit_log.html',
+                             audit_logs=audit_logs,
+                             available_actions=[a[0] for a in available_actions if a[0]],
+                             available_tables=[t[0] for t in available_tables if t[0]])
+    except Exception as e:
+        flash(f'Error loading audit log: {str(e)}', 'error')
+        return redirect(url_for('admin.dashboard'))

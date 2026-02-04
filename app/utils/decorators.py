@@ -23,14 +23,14 @@ def admin_required(f):
     """Legacy admin required decorator - eventually replace with permissions"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.has_role('Admin'): # Use has_role for stricter check? Or has_permission('admin_access')
-             # For legacy compatibility, check explicit Role OR 'admin_access' perm if we had it.
-             # But init_rbac gave Admin all permissions.
-             # Let's keep checking Role for "Super Admin" areas for now.
-            if not current_user.has_role('Admin'):
-                 flash('Admin access required', 'error')
-                 return redirect(url_for('auth.login'))
-            return f(*args, **kwargs)
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
+        
+        if not current_user.has_role('Admin'):
+            flash('Admin access required', 'error')
+            return redirect(url_for('auth.login'))
+            
+        return f(*args, **kwargs)
     return decorated_function
 
 def staff_required(f):
